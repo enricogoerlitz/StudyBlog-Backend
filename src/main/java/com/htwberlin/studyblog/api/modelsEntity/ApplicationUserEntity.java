@@ -1,4 +1,4 @@
-package com.htwberlin.studyblog.api.modelsentity;
+package com.htwberlin.studyblog.api.modelsEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

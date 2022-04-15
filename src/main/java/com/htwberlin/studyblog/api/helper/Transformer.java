@@ -1,7 +1,7 @@
 package com.htwberlin.studyblog.api.helper;
 
 import com.htwberlin.studyblog.api.models.ApplicationUserModel;
-import com.htwberlin.studyblog.api.modelsentity.ApplicationUserEntity;
+import com.htwberlin.studyblog.api.modelsEntity.ApplicationUserEntity;
 
 import java.util.Optional;
 

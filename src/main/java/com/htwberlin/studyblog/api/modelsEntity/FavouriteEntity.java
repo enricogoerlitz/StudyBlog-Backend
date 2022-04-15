@@ -1,6 +1,4 @@
-package com.htwberlin.studyblog.api.modelsentity;
-
-import javax.persistence.Entity;
+package com.htwberlin.studyblog.api.modelsEntity;
 
 //@Entity(name = "favourites")
 public class FavouriteEntity {
