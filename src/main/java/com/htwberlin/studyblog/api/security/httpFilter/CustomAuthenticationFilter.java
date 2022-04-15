@@ -3,6 +3,7 @@ package com.htwberlin.studyblog.api.security.httpFilter;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.htwberlin.studyblog.api.config.ENV;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -47,7 +48,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
             .withExpiresAt(new Date(System.currentTimeMillis() + 60 * 1000 * 10))
             .withIssuer(request.getRequestURL().toString())
             .withClaim("roles", user.getAuthorities().stream().map(authority -> authority.getAuthority()).collect(Collectors.joining()))
-            .sign(Algorithm.HMAC256("secret".getBytes()));
+            .sign(Algorithm.HMAC256(ENV.getJWTSecret().getBytes()));
 
         //response.setHeader("studyblog_jwt", jwtToken);
         var jwtMap = Map.of("studyblog_jwt", jwtToken);

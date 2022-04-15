@@ -3,6 +3,7 @@ package com.htwberlin.studyblog;
 import com.htwberlin.studyblog.api.authentication.Role;
 import com.htwberlin.studyblog.api.models.ApplicationUserModel;
 import com.htwberlin.studyblog.api.service.ApplicationUserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 @SpringBootApplication
 public class StudyblogApplication {
 
@@ -23,6 +25,7 @@ public class StudyblogApplication {
 
 	@Bean
 	CommandLineRunner run(ApplicationUserService userService) {
+		log.warn("HERE IS THE URL: {}", System.getenv().get("DATASOURCE_URL"));
 		return args -> {
 			getInitUsers().stream().forEach(user -> userService.registerUser(user));
 		};

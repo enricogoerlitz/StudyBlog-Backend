@@ -3,6 +3,7 @@ package com.htwberlin.studyblog.api.security.httpFilter;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.htwberlin.studyblog.api.config.ENV;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.parser.Authorization;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,7 +30,8 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         // TODO: if condition outsourcen
         String authHeader = request.getHeader(AUTHORIZATION);
-        if(request.getServletPath().equals("/api/v1/login")) {
+        String route = request.getServletPath();
+        if(route.equals("/api/v1/login") || route.equals("/test/helloworld")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -44,7 +46,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
         try {
             // TODO: bearer in constants
             String jwt = authHeader.substring("Bearer ".length());
-            var algorithm = Algorithm.HMAC256("secret".getBytes());
+            var algorithm = Algorithm.HMAC256(ENV.getJWTSecret().getBytes());
             var jwtVerifyer = JWT.require(algorithm).build();
             var decodedJwt = jwtVerifyer.verify(jwt);
             String username = decodedJwt.getSubject();
