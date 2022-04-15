@@ -8,6 +8,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /** TODO: implement a Many-to-Many relationship to ApplicationUserEntity and FavouriteEntity
  *
@@ -30,4 +32,8 @@ public class ApplicationUserEntity {
 
     @Column(name = "role", nullable = false)
     private String role;
+
+    @OneToMany(mappedBy = "creator", fetch = FetchType.EAGER)
+    @Column(name = "blog_posts")
+    private List<BlogPostEntity> blogPosts = new ArrayList<>();
 }

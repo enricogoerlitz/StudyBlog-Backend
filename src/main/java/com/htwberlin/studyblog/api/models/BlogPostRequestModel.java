@@ -5,16 +5,13 @@ import lombok.Data;
 
 import java.util.Date;
 
-/** TODO: implement the BlogPostModel and add the entity for this
- *
- */
-@Data
 @AllArgsConstructor
-public class BlogPostModel {
+@Data
+public class BlogPostRequestModel {
     private Long id;
     private String title;
     private String content;
     private Date creationDate;
     private Date lastEditDate;
-    private ApplicationUserModel creator;
+    private Long creatorId;
 }

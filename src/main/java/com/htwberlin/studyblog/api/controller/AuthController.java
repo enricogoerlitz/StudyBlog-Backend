@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
  *
  */
 @RestController
-@RequestMapping(Routes.AUTH)
+@RequestMapping(Routes.API + Routes.AUTH)
 public class AuthController {
 
     @GetMapping(Routes.HELLO_WORLD)

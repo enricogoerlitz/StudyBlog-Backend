@@ -9,6 +9,6 @@ import java.util.List;
 @Repository
 public interface ApplicationUserRepository extends JpaRepository<ApplicationUserEntity, Long> {
     ApplicationUserEntity findByUsername(String username);
-
     List<ApplicationUserEntity> findAll();
+    void deleteById(Long id);
 }

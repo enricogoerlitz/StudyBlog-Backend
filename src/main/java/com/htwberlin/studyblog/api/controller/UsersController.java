@@ -29,6 +29,14 @@ import java.util.List;
 public class UsersController {
     private final ApplicationUserService userService;
 
+    @GetMapping(Routes.ADMIN_USERS)
+    public ResponseEntity<List<ApplicationUserModel>> getUsers() {
+        var users = userService.getUsers();
+        if(users == null) return ResponseEntity.notFound().build();
+
+        return ResponseEntity.ok().body(users);
+    }
+
     @PostMapping(Routes.USERS)
     public ResponseEntity<ApplicationUserModel> registerUser(@RequestBody ApplicationUserModel user) {
         user.setRole(Role.STUDENT.name());
@@ -36,14 +44,6 @@ public class UsersController {
         if(createdUser == null) return ResponseEntity.badRequest().build();
 
         return ResponseEntity.created(null).body(createdUser);
-    }
-
-    @GetMapping(Routes.ADMIN_USERS)
-    public ResponseEntity<List<ApplicationUserModel>> getUsers() {
-        var users = userService.getUsers();
-        if(users == null) return ResponseEntity.notFound().build();
-
-        return ResponseEntity.ok().body(users);
     }
 
     @PostMapping(Routes.ADMIN_USERS)

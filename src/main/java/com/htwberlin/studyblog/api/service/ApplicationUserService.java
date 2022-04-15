@@ -22,12 +22,12 @@ import java.util.List;
 @Transactional
 @Slf4j
 public class ApplicationUserService implements UserDetailsService {
-    private final ApplicationUserRepository repository;
+    private final ApplicationUserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        var user = repository.findByUsername(username);
+        var user = userRepository.findByUsername(username);
         if(user == null) {
             log.error("User with username {} not found", username);
             throw new UsernameNotFoundException("User not found");
@@ -44,26 +44,38 @@ public class ApplicationUserService implements UserDetailsService {
     public ApplicationUserModel registerUser(ApplicationUserModel user) {
         log.info("Saving new user to the db.");
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        var entityUser = Transformer.userModelToEntity(user);
-        var registeredUser = repository.save(entityUser);
+        var registeredUser = userRepository.save(Transformer.userModelToEntity(user));
+
         return Transformer.userEntityToModel(registeredUser);
     }
 
     public ApplicationUserModel getUser(Long id) {
         log.info("fetching user from the db.");
-        var user = repository.findById(id);
+        var user = userRepository.findById(id);
+
         return Transformer.userEntityToModel(user);
     }
 
     public ApplicationUserModel getUser(String username) {
         log.info("fetching user from the db.");
-        var user = repository.findByUsername(username);
+        var user = userRepository.findByUsername(username);
+
         return Transformer.userEntityToModel(user);
     }
 
     public List<ApplicationUserModel> getUsers() {
         log.info("fetching all users from the db.");
-        var users = repository.findAll();
+        var users = userRepository.findAll();
         return users.stream().map(entity -> Transformer.userEntityToModel(entity)).toList();
+    }
+
+    // TODO: implement delete user
+    public void deleteUser() {
+        throw new RuntimeException();
+    }
+
+    // TODO: implement update user
+    public ApplicationUserModel updateUser(ApplicationUserModel updatedUser) {
+        throw new RuntimeException();
     }
 }
