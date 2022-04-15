@@ -10,11 +10,9 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 import java.util.Arrays;
 import java.util.List;
@@ -35,9 +33,7 @@ public class ApplicationUserService implements UserDetailsService {
             throw new UsernameNotFoundException("User not found");
         }
         log.info("User with username {} found", username);
-        // SET COOKIE!
-        // LOGIN
-        // send http.req => /api/auth/setcookie
+
         return new User(
             user.getUsername(),
             user.getPassword(),
@@ -52,7 +48,7 @@ public class ApplicationUserService implements UserDetailsService {
         var registeredUser = repository.save(entityUser);
         return Transformer.userEntityToModel(registeredUser);
     }
-    
+
     public ApplicationUserModel getUser(Long id) {
         log.info("fetching user from the db.");
         var user = repository.findById(id);

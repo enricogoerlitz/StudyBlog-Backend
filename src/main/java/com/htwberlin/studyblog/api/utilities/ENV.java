@@ -1,4 +1,4 @@
-package com.htwberlin.studyblog.api.config;
+package com.htwberlin.studyblog.api.utilities;
 
 public final class ENV {
     public static String getJWTSecret() {

@@ -3,6 +3,7 @@ package com.htwberlin.studyblog.api.controller;
 import com.htwberlin.studyblog.api.authentication.Role;
 import com.htwberlin.studyblog.api.models.ApplicationUserModel;
 import com.htwberlin.studyblog.api.service.ApplicationUserService;
+import com.htwberlin.studyblog.api.utilities.Routes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,12 +24,12 @@ import java.util.List;
  *      /posts/remove_favourite?{id}    (if not mine and is favourite)
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping(Routes.API)
 @RequiredArgsConstructor
 public class UsersController {
     private final ApplicationUserService userService;
 
-    @PostMapping("/v1/users")
+    @PostMapping(Routes.USERS)
     public ResponseEntity<ApplicationUserModel> registerUser(@RequestBody ApplicationUserModel user) {
         user.setRole(Role.STUDENT.name());
         var createdUser = userService.registerUser(user);
@@ -37,7 +38,7 @@ public class UsersController {
         return ResponseEntity.created(null).body(createdUser);
     }
 
-    @GetMapping("/v1/admin/users")
+    @GetMapping(Routes.ADMIN_USERS)
     public ResponseEntity<List<ApplicationUserModel>> getUsers() {
         var users = userService.getUsers();
         if(users == null) return ResponseEntity.notFound().build();
@@ -45,7 +46,7 @@ public class UsersController {
         return ResponseEntity.ok().body(users);
     }
 
-    @PostMapping("/v1/admin/users")
+    @PostMapping(Routes.ADMIN_USERS)
     public ResponseEntity<ApplicationUserModel> registerUserByAdmin(@RequestBody ApplicationUserModel user) {
         var createdUser = userService.registerUser(user);
         if(createdUser == null) return ResponseEntity.badRequest().build();
