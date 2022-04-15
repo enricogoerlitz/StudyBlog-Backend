@@ -13,7 +13,6 @@ import java.util.List;
 
 import static java.rmi.server.LogStream.log;
 
-
 @Service
 @RequiredArgsConstructor
 @Transactional
