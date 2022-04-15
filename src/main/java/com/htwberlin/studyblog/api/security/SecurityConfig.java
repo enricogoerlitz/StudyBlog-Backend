@@ -1,6 +1,8 @@
 package com.htwberlin.studyblog.api.security;
 
+import com.htwberlin.studyblog.api.authentication.Role;
 import com.htwberlin.studyblog.api.security.httpFilter.CustomAuthenticationFilter;
+import com.htwberlin.studyblog.api.security.httpFilter.CustomAuthorizationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +15,12 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import java.util.Arrays;
+
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
 
 @Configuration
 @EnableWebSecurity
@@ -30,8 +38,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.authorizeRequests().anyRequest().permitAll();
-        http.addFilter(new CustomAuthenticationFilter(authenticationManagerBean()));
+
+        http.authorizeRequests().antMatchers(POST, "/api/v1/login/**").permitAll();
+        http.authorizeRequests().antMatchers(GET, "/api/v1/users/**").hasAnyAuthority(Role.ADMIN.name());
+        http.authorizeRequests().anyRequest().authenticated();
+
+        // TODO: outsource
+        var customAuthFilter = new CustomAuthenticationFilter(authenticationManagerBean());
+        customAuthFilter.setFilterProcessesUrl("/api/v1/login");
+        http.addFilter(customAuthFilter);
+        http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 
     // TODO: Delete?

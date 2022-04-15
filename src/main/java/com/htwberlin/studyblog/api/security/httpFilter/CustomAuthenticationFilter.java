@@ -1,8 +1,8 @@
 package com.htwberlin.studyblog.api.security.httpFilter;
 
 import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,9 +17,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.Map;
 import java.util.stream.Collectors;
+
+import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 @Slf4j
 @AllArgsConstructor
@@ -46,6 +48,10 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
             .withIssuer(request.getRequestURL().toString())
             .withClaim("roles", user.getAuthorities().stream().map(authority -> authority.getAuthority()).collect(Collectors.joining()))
             .sign(Algorithm.HMAC256("secret".getBytes()));
-        response.setHeader("studyblog_jwt", jwtToken);
+
+        //response.setHeader("studyblog_jwt", jwtToken);
+        var jwtMap = Map.of("studyblog_jwt", jwtToken);
+        response.setContentType(APPLICATION_JSON_VALUE);
+        new ObjectMapper().writeValue(response.getOutputStream(), jwtMap);
     }
 }
