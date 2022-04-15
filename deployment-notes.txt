@@ -1,0 +1,10 @@
+1) add system.properties:
+    - java.runtime.version=17
+
+2) add Procfile
+    - web java -Dserver.port=$PORT $JAVA_OPTS -jar build/libs/[helloworld-0.0.1-SNAPSHOT.jar]
+    - you can find the snapshot name in build/libs/[*first.jar]
+
+3) Run in Terminal:
+    - heroku ps:scale web=1 -a [app-name]
+    => heroku ps:scale web=1 -a studyblog-api

@@ -1,23 +1,43 @@
 package com.htwberlin.studyblog.api.controller;
 
+import com.htwberlin.studyblog.api.authentication.Role;
 import com.htwberlin.studyblog.api.models.ApplicationUserModel;
-import com.htwberlin.studyblog.api.repository.ApplicationUserRepository;
 import com.htwberlin.studyblog.api.service.ApplicationUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.URI;
 import java.util.List;
 
+/** TODO: UsersController -> add folloing routes
+ *  /users/delete?{id}  *&&*    /admin/users/delete?{id}
+ *  /users/edit?{id}    *&&*    /admin/edit?{id}
+ */
+
+/** TODO: Controller-Package -> add folling Controllers
+ *  BlogPostController
+ *      /posts/add
+ *      /posts/edit?{id}                (if me is the creator oder admin)
+ *      /posts/delete?{id}              (if me is the creator oder admin)
+ *      /posts/add_favourite?{id}       (if not mine)
+ *      /posts/remove_favourite?{id}    (if not mine and is favourite)
+ */
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class UsersController {
     private final ApplicationUserService userService;
 
-    @GetMapping("/v1/users")
+    @PostMapping("/v1/users")
+    public ResponseEntity<ApplicationUserModel> registerUser(@RequestBody ApplicationUserModel user) {
+        user.setRole(Role.STUDENT.name());
+        var createdUser = userService.registerUser(user);
+        if(createdUser == null) return ResponseEntity.badRequest().build();
+
+        return ResponseEntity.created(null).body(createdUser);
+    }
+
+    @GetMapping("/v1/admin/users")
     public ResponseEntity<List<ApplicationUserModel>> getUsers() {
         var users = userService.getUsers();
         if(users == null) return ResponseEntity.notFound().build();
@@ -25,14 +45,11 @@ public class UsersController {
         return ResponseEntity.ok().body(users);
     }
 
-    @PostMapping("/v1/users")
-    public ResponseEntity<ApplicationUserModel> registerUser(@RequestBody ApplicationUserModel user) {
+    @PostMapping("/v1/admin/users")
+    public ResponseEntity<ApplicationUserModel> registerUserByAdmin(@RequestBody ApplicationUserModel user) {
         var createdUser = userService.registerUser(user);
         if(createdUser == null) return ResponseEntity.badRequest().build();
 
-        // TODO: test the uri and applicationusermodel
-        // URI uri = URI.create(ServletUriComponentsBuilder.fromContextPath(null).path("/api/v1/users").toUriString())
-        // no applicationUsrModel!
         return ResponseEntity.created(null).body(createdUser);
     }
 }
