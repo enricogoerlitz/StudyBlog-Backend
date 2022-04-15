@@ -20,9 +20,10 @@ import static java.rmi.server.LogStream.log;
 public class ApplicationUserService {
     private final ApplicationUserRepository repository;
 
-    ApplicationUserModel registerUser(ApplicationUserEntity user) {
+    public ApplicationUserModel registerUser(ApplicationUserModel user) {
         log.info("Saving new user to the db.");
-        var registeredUser = repository.save(user);
+        var entityUser = Transformer.userModelToEntity(user);
+        var registeredUser = repository.save(entityUser);
         return Transformer.userEntityToModel(registeredUser);
     }
 
@@ -33,19 +34,19 @@ public class ApplicationUserService {
     }
     */
 
-    ApplicationUserModel getUser(Long id) {
+    public ApplicationUserModel getUser(Long id) {
         log.info("fetching user from the db.");
         var user = repository.findById(id);
         return Transformer.userEntityToModel(user);
     }
 
-    ApplicationUserModel getUser(String username) {
+    public ApplicationUserModel getUser(String username) {
         log.info("fetching user from the db.");
         var user = repository.findByUsername(username);
         return Transformer.userEntityToModel(user);
     }
 
-    List<ApplicationUserModel> getUsers() {
+    public List<ApplicationUserModel> getUsers() {
         log.info("fetching all users from the db.");
         var users = repository.findAll();
         return users.stream().map(entity -> Transformer.userEntityToModel(entity)).toList();

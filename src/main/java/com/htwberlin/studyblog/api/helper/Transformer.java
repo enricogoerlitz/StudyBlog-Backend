@@ -19,4 +19,14 @@ public final class Transformer {
             userEntity.getRole()
         );
     }
+
+    public static ApplicationUserEntity userModelToEntity(ApplicationUserModel userModel) {
+        if(userModel == null) return null;
+        return new ApplicationUserEntity(
+            userModel.getId(),
+            userModel.getUsername(),
+            userModel.getPassword(),
+            userModel.getRole()
+        );
+    }
 }
