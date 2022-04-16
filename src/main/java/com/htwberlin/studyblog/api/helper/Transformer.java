@@ -1,21 +1,19 @@
 package com.htwberlin.studyblog.api.helper;
 
-import com.htwberlin.studyblog.api.models.ApplicationUserModel;
 import com.htwberlin.studyblog.api.models.BlogPostModel;
-import com.htwberlin.studyblog.api.models.BlogPostRequestModel;
 import com.htwberlin.studyblog.api.modelsEntity.ApplicationUserEntity;
 import com.htwberlin.studyblog.api.modelsEntity.BlogPostEntity;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 public final class Transformer {
+    /*
     public static ApplicationUserModel userEntityToModel(Optional<ApplicationUserEntity> userEntity) {
         if(userEntity.isEmpty()) return null;
         return userEntityToModel(userEntity.get());
     }
 
+
+     */
+    /*
     public static ApplicationUserModel userEntityToModel(ApplicationUserEntity userEntity) {
         if(userEntity == null) return null;
         return new ApplicationUserModel(
@@ -26,6 +24,8 @@ public final class Transformer {
         );
     }
 
+     */
+/*
     public static ApplicationUserEntity userModelToEntity(ApplicationUserModel userModel) {
         if(userModel == null) return null;
         return new ApplicationUserEntity(
@@ -85,7 +85,7 @@ public final class Transformer {
     }
      */
 
-    public static BlogPostEntity blogPostRequestModelToEntity(BlogPostRequestModel blogPostRequest, ApplicationUserEntity user) {
+    public static BlogPostEntity blogPostModelToEntity(BlogPostModel blogPostRequest, ApplicationUserEntity user) {
         return new BlogPostEntity(
                 blogPostRequest.getId(),
                 blogPostRequest.getTitle(),

@@ -4,17 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
-/** TODO: implement the BlogPostModel and add the entity for this
- *
- */
-@Data
 @AllArgsConstructor
+@Data
 public class BlogPostModel {
     private Long id;
     private String title;
     private String content;
     private Date creationDate;
     private Date lastEditDate;
-    private ApplicationUserModel creator;
+    private Long creatorId;
+    private List<FavoritesModel> favourites;
 }

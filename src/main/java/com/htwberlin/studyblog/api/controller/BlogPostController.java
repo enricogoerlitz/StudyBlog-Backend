@@ -1,29 +1,21 @@
 package com.htwberlin.studyblog.api.controller;
 
 import com.htwberlin.studyblog.api.models.BlogPostModel;
-import com.htwberlin.studyblog.api.models.BlogPostRequestModel;
 import com.htwberlin.studyblog.api.modelsEntity.BlogPostEntity;
 import com.htwberlin.studyblog.api.service.BlogPostService;
+import com.htwberlin.studyblog.api.utilities.HttpResponseWriter;
 import com.htwberlin.studyblog.api.utilities.Routes;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 
-/** TODO: save all manipulation routes by authorize by user => is user also creator
- *  with JWT-Cookie and with AuthHeader JWT
- */
-
-/** TODO: wrap everything in a try-catch-block
- *
- */
-
-/** TODO: add the following routes
- *   - get by owner
- *   - put edit by admin
- *   - delete delete by admin
- */
 @RestController
 @RequestMapping(Routes.API)
 @RequiredArgsConstructor
@@ -31,56 +23,89 @@ public class BlogPostController {
     private final BlogPostService blogPostService;
 
     @GetMapping(Routes.BLOGPOSTS)
-    public ResponseEntity<List<BlogPostEntity>> getBlogposts() {
-        var blogPosts = blogPostService.getBlogPosts();
-        if(blogPosts == null) return ResponseEntity.notFound().build();
+    public ResponseEntity<List<BlogPostEntity>> getBlogposts(HttpServletResponse response) throws IOException {
+        try {
+            var blogPosts = blogPostService.getBlogPosts();
+            if(blogPosts == null) return ResponseEntity.notFound().build();
 
-        return ResponseEntity.ok().body(blogPosts);
+            return ResponseEntity.status(HttpStatus.OK).body(blogPosts);
+        } catch(Exception exp) {
+            HttpResponseWriter.writeJsonResponse(response, HttpResponseWriter.error(exp));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
     }
 
     @PostMapping(Routes.BLOGPOSTS)
-    public ResponseEntity<BlogPostEntity> addBlogPost(@RequestBody BlogPostRequestModel blogPost) {
-        var addedBlogPost = blogPostService.addBlogpost(blogPost);
-        if(addedBlogPost == null) return ResponseEntity.badRequest().build();
-
-        return ResponseEntity.created(null).body(addedBlogPost);
-    }
-
-    // TODO: save by creator.username == jwt.username => forbidden
-    @PutMapping(Routes.BLOGPOSTS)
-    public ResponseEntity<BlogPostEntity> updateBlogPost(@RequestBody BlogPostRequestModel blogPost) {
-        var updatedBlogPost = blogPostService.updateBlogPost(blogPost);
-        if(updatedBlogPost == null) return ResponseEntity.badRequest().build();
-
-        return ResponseEntity.ok().body(updatedBlogPost);
-    }
-
-    @PutMapping(Routes.ADMIN_BLOGPOSTS)
-    public ResponseEntity<BlogPostEntity> updateBlogPostByAdmin(@RequestBody BlogPostRequestModel blogPost) {
-        var updatedBlogPost = blogPostService.updateBlogPost(blogPost);
-        if(updatedBlogPost == null) return ResponseEntity.badRequest().build();
-
-        return ResponseEntity.ok().body(updatedBlogPost);
-    }
-
-    // TODO: save by creator.username == jwt.username => forbidden
-    @DeleteMapping(Routes.BLOGPOSTS)
-    public ResponseEntity<Void> deleteBlogPost(Long id) {
+    public ResponseEntity<BlogPostEntity> addBlogPost(HttpServletResponse response, @RequestBody BlogPostModel blogPost) throws IOException {
         try {
-            blogPostService.deleteBlogPost(id);
-            return ResponseEntity.ok().build();
+            var addedBlogPost = blogPostService.addBlogpost(blogPost);
+            if(addedBlogPost == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+
+            return ResponseEntity.created(null).body(addedBlogPost);
         } catch (Exception exp) {
-            return ResponseEntity.badRequest().build();
+            HttpResponseWriter.writeJsonResponse(response, HttpResponseWriter.error(exp));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
-    @DeleteMapping(Routes.ADMIN_BLOGPOSTS)
-    public ResponseEntity<Void> deleteBlogPostByAdmin(Long id) {
+    @PutMapping(Routes.BLOGPOSTS)
+    public ResponseEntity<BlogPostEntity> updateBlogPost(HttpServletRequest request, HttpServletResponse response, @RequestBody BlogPostModel blogPost) throws IOException {
         try {
-            blogPostService.deleteBlogPost(id);
-            return ResponseEntity.ok().build();
+            var updatedBlogPost = blogPostService.updateBlogPost(request, blogPost);
+            if(updatedBlogPost == null) return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+
+            return ResponseEntity.ok().body(updatedBlogPost);
+        } catch(AuthorizationServiceException exp) {
+            HttpResponseWriter.writeJsonResponse(response, HttpResponseWriter.error(exp));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } catch(Exception exp) {
+            HttpResponseWriter.writeJsonResponse(response, HttpResponseWriter.error(exp));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PutMapping(Routes.ADMIN_BLOGPOSTS)
+    public ResponseEntity<BlogPostEntity> updateBlogPostByAdmin(HttpServletResponse response, @RequestBody BlogPostModel blogPost) throws IOException {
+        try {
+            var updatedBlogPost = blogPostService.updateBlogPostByAdmin(blogPost);
+            if (updatedBlogPost == null) return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+
+            return ResponseEntity.status(HttpStatus.OK).body(updatedBlogPost);
         } catch (Exception exp) {
-            return ResponseEntity.badRequest().build();
+            HttpResponseWriter.writeJsonResponse(response, HttpResponseWriter.error(exp));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @DeleteMapping(Routes.BLOGPOSTS + "/{id}")
+    public ResponseEntity<Void> deleteBlogPost(HttpServletRequest request, HttpServletResponse response, @PathVariable String id) throws IOException {
+        try {
+            blogPostService.deleteBlogPost(request, id);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+        } catch (AuthorizationServiceException exp) {
+            HttpResponseWriter.writeJsonResponse(response, HttpResponseWriter.error(exp));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } catch(IllegalArgumentException exp) {
+            HttpResponseWriter.writeJsonResponse(response, HttpResponseWriter.error(exp));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch (Exception exp) {
+            HttpResponseWriter.writeJsonResponse(response, HttpResponseWriter.error(exp));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @DeleteMapping(Routes.ADMIN_BLOGPOSTS + "/{id}")
+    public ResponseEntity<Void> deleteBlogPostByAdmin(HttpServletResponse response, @PathVariable String id) throws IOException {
+        try {
+            blogPostService.deleteBlogPostByAdmin(id);
+            return ResponseEntity.ok().build();
+        } catch(IllegalArgumentException exp) {
+            HttpResponseWriter.writeJsonResponse(response, HttpResponseWriter.error(exp));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch (Exception exp) {
+            HttpResponseWriter.writeJsonResponse(response, HttpResponseWriter.error(exp));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }

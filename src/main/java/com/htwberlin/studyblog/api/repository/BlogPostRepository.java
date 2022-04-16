@@ -8,6 +8,8 @@ import java.util.List;
 
 @Repository
 public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> {
+    /*
     List<BlogPostEntity> findAll();
     void deleteById(Long id);
+     */
 }

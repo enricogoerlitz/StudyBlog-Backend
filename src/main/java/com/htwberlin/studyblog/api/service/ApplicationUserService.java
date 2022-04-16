@@ -42,32 +42,32 @@ public class ApplicationUserService implements UserDetailsService {
         );
     }
 
-    public ApplicationUserModel registerUser(ApplicationUserEntity user) {
+    public ApplicationUserEntity registerUser(ApplicationUserEntity user) {
         log.info("Saving new user to the db.");
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         var registeredUser = userRepository.save(user);
 
-        return Transformer.userEntityToModel(registeredUser);
+        return registeredUser;
     }
 
-    public ApplicationUserModel getUser(Long id) {
+    public ApplicationUserEntity getUser(Long id) {
         log.info("fetching user from the db.");
         var user = userRepository.findById(id);
-
-        return Transformer.userEntityToModel(user);
+        if(user == null) return null;
+        return user.get();
     }
 
-    public ApplicationUserModel getUser(String username) {
+    public ApplicationUserEntity getUser(String username) {
         log.info("fetching user from the db.");
         var user = userRepository.findByUsername(username);
 
-        return Transformer.userEntityToModel(user);
+        return user;
     }
 
-    public List<ApplicationUserModel> getUsers() {
+    public List<ApplicationUserEntity> getUsers() {
         log.info("fetching all users from the db.");
         var users = userRepository.findAll();
-        return users.stream().map(entity -> Transformer.userEntityToModel(entity)).toList();
+        return users; // users.stream().map(entity -> Transformer.userEntityToModel(entity)).toList();
     }
 
     // TODO: implement delete user

@@ -3,10 +3,9 @@ package com.htwberlin.studyblog;
 import com.htwberlin.studyblog.api.authentication.Role;
 import com.htwberlin.studyblog.api.modelsEntity.ApplicationUserEntity;
 import com.htwberlin.studyblog.api.modelsEntity.BlogPostEntity;
-import com.htwberlin.studyblog.api.modelsEntity.FavouriteEntity;
-import com.htwberlin.studyblog.api.repository.FavouriteRepository;
+import com.htwberlin.studyblog.api.modelsEntity.FavoritesEntity;
 import com.htwberlin.studyblog.api.service.BlogPostService;
-import com.htwberlin.studyblog.api.service.FavouriteService;
+import com.htwberlin.studyblog.api.service.FavoritesService;
 import com.htwberlin.studyblog.api.utilities.ENV;
 import com.htwberlin.studyblog.api.service.ApplicationUserService;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +30,7 @@ public class StudyblogApplication {
 	}
 
 	@Bean
-	CommandLineRunner run(ApplicationUserService userService, BlogPostService blogPostService, FavouriteService favouriteService) {
+	CommandLineRunner run(ApplicationUserService userService, BlogPostService blogPostService, FavoritesService favouriteService) {
 		log.warn(Boolean.toString(blogPostService == null));
 		return args -> {
 			getInitUsers().stream().forEach(user -> {
@@ -77,8 +76,8 @@ public class StudyblogApplication {
 		return posts;
 	}
 
-	private List<FavouriteEntity> getInitFavourites(ApplicationUserEntity user, BlogPostEntity blogPost) {
-		var fav1 = new FavouriteEntity(null, user, blogPost);
+	private List<FavoritesEntity> getInitFavourites(ApplicationUserEntity user, BlogPostEntity blogPost) {
+		var fav1 = new FavoritesEntity(null, user, blogPost);
 		var initFavouriteslList = Arrays.asList(fav1);
 
 		return initFavouriteslList;

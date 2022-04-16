@@ -5,6 +5,7 @@ package com.htwberlin.studyblog.api.utilities;
  */
 public final class Routes {
     public static final String API = "/api";
+    public static final String V1 = "/v1";
     public static final String AUTH = "/auth";
     public static final String LOGIN = "/v1/login";
     public static final String USERS = "/v1/users";

@@ -4,10 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.context.annotation.Configuration;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -42,7 +40,7 @@ public class BlogPostEntity {
 
     @OneToMany(cascade = CascadeType.MERGE)
     @JsonIgnore
-    private List<FavouriteEntity> favourites;
+    private List<FavoritesEntity> favourites;
 
     /*
     public BlogPostEntity(Long id, String title, String content, Date creationDate, Date lastEditDate, ApplicationUserEntity creator) {

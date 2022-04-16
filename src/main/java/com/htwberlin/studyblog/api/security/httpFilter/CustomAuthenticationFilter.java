@@ -37,7 +37,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
         String jwtToken = ApplicationJWT.createToken(request, authResult);
-        response.addCookie(new Cookie(ApplicationJWT.KEY_STUDYBLOG, jwtToken));
-        HttpResponseWriter.writeJsonResponse(response, Map.of(ApplicationJWT.KEY_STUDYBLOG, jwtToken));
+        response.addCookie(new Cookie(ApplicationJWT.JWT_KEY_STUDYBLOG, jwtToken));
+        HttpResponseWriter.writeJsonResponse(response, Map.of(ApplicationJWT.JWT_KEY_STUDYBLOG, jwtToken));
     }
 }

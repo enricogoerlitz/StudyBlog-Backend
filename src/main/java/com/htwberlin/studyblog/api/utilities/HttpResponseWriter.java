@@ -13,4 +13,12 @@ public final class HttpResponseWriter {
         response.setContentType(APPLICATION_JSON_VALUE);
         new ObjectMapper().writeValue(response.getOutputStream(), writingMap);
     }
+
+    public static Map<String, String> error(Exception exp) {
+        return Map.of("error_msg", exp.getMessage());
+    }
+
+    public static Map<String, String> error(String exceptionMessage) {
+        return Map.of("error_msg", exceptionMessage);
+    }
 }

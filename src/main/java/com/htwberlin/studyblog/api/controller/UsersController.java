@@ -1,11 +1,11 @@
 package com.htwberlin.studyblog.api.controller;
 
 import com.htwberlin.studyblog.api.authentication.Role;
-import com.htwberlin.studyblog.api.models.ApplicationUserModel;
 import com.htwberlin.studyblog.api.modelsEntity.ApplicationUserEntity;
 import com.htwberlin.studyblog.api.service.ApplicationUserService;
 import com.htwberlin.studyblog.api.utilities.Routes;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,7 +31,7 @@ public class UsersController {
     private final ApplicationUserService userService;
 
     @GetMapping(Routes.ADMIN_USERS)
-    public ResponseEntity<List<ApplicationUserModel>> getUsers() {
+    public ResponseEntity<List<ApplicationUserEntity>> getUsers() {
         var users = userService.getUsers();
         if(users == null) return ResponseEntity.notFound().build();
 
@@ -39,16 +39,16 @@ public class UsersController {
     }
 
     @PostMapping(Routes.USERS)
-    public ResponseEntity<ApplicationUserModel> registerUser(@RequestBody ApplicationUserEntity user) {
+    public ResponseEntity<ApplicationUserEntity> registerUser(@RequestBody ApplicationUserEntity user) {
         user.setRole(Role.STUDENT.name());
         var createdUser = userService.registerUser(user);
-        if(createdUser == null) return ResponseEntity.badRequest().build();
+        if(createdUser == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 
         return ResponseEntity.created(null).body(createdUser);
     }
 
     @PostMapping(Routes.ADMIN_USERS)
-    public ResponseEntity<ApplicationUserModel> registerUserByAdmin(@RequestBody ApplicationUserEntity user) {
+    public ResponseEntity<ApplicationUserEntity> registerUserByAdmin(@RequestBody ApplicationUserEntity user) {
         var createdUser = userService.registerUser(user);
         if(createdUser == null) return ResponseEntity.badRequest().build();
 

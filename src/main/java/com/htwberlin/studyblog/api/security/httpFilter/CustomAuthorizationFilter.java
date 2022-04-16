@@ -1,6 +1,7 @@
 package com.htwberlin.studyblog.api.security.httpFilter;
 
 import com.htwberlin.studyblog.api.authentication.ApplicationJWT;
+import com.htwberlin.studyblog.api.authentication.JWTVerificationResponse;
 import com.htwberlin.studyblog.api.utilities.HttpResponseWriter;
 import com.htwberlin.studyblog.api.utilities.Routes;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +24,9 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
     private final List<String> excludesUrls = Arrays.asList(
         Routes.API + Routes.LOGIN,
         Routes.API + Routes.AUTH + Routes.HELLO_WORLD,
-        "/api/v1/users"
+        "/api/v1/users",
+        "/api/v1/auth/",
+        "/api/v1/auth"
     );
 
     @Override
@@ -35,17 +38,24 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
             return;
         }
 
-        var tokenValidation = ApplicationJWT.validateToken(ApplicationJWT.getTokenFromRequest(request));
+        var tokenValidation = getTokenValidation(request); // ApplicationJWT.validateToken(ApplicationJWT.getTokenFromRequestHeader(request));
         if(!tokenValidation.isValid()) {
             log.warn("jwt token is invalid! Error: {}", tokenValidation.getErrorMessage());
             response.setStatus(FORBIDDEN.value());
-            HttpResponseWriter.writeJsonResponse(response, Map.of("access_denied", "No access. Please enter a valid Access-Token", "error", tokenValidation.getErrorMessage()));
+            HttpResponseWriter.writeJsonResponse(response, Map.of("access_denied", "No access. Please enter a valid Access-Token", "error_msg", tokenValidation.getErrorMessage()));
             return;
         }
 
         log.info("jwt token is valid!");
         SecurityContextHolder.getContext().setAuthentication(tokenValidation.getAuthenticationToken());
         filterChain.doFilter(request, response);
+    }
+
+    private static JWTVerificationResponse getTokenValidation(HttpServletRequest request) {
+        String cookieToken = ApplicationJWT.getTokenFromRequestCookie(request);
+        if(cookieToken != null) return ApplicationJWT.validateToken(cookieToken);
+
+        return ApplicationJWT.validateToken(ApplicationJWT.getTokenFromRequestHeader(request));
     }
 
     private boolean isUrlExcluded(String route) {
