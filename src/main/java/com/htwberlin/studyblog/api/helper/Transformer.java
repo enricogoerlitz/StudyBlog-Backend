@@ -1,10 +1,22 @@
 package com.htwberlin.studyblog.api.helper;
 
+import com.htwberlin.studyblog.api.models.ApplicationUserModel;
 import com.htwberlin.studyblog.api.models.BlogPostModel;
 import com.htwberlin.studyblog.api.modelsEntity.ApplicationUserEntity;
 import com.htwberlin.studyblog.api.modelsEntity.BlogPostEntity;
 
 public final class Transformer {
+
+    public static ApplicationUserModel userEntityToModel(ApplicationUserEntity entityUser) {
+        if(entityUser == null)
+            throw new IllegalArgumentException("Entity User was null!");
+
+        return new ApplicationUserModel(
+            entityUser.getId(),
+            entityUser.getUsername(),
+            entityUser.getRole()
+        );
+    }
     /*
     public static ApplicationUserModel userEntityToModel(Optional<ApplicationUserEntity> userEntity) {
         if(userEntity.isEmpty()) return null;

@@ -16,8 +16,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.*;
 
 @Configuration
 @EnableWebSecurity
@@ -39,6 +38,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().antMatchers(POST, "/api/v1/login/**").permitAll();
         http.authorizeRequests().antMatchers(POST, "/api/v1/users/**").permitAll();
         http.authorizeRequests().antMatchers(GET, "/api/v1/auth/**").permitAll();
+        http.authorizeRequests().antMatchers(PUT, "/api/v1/users/**").hasAnyAuthority(Role.ADMIN.name(), Role.STUDENT.name());
         http.authorizeRequests().antMatchers(GET, "/api/v1/users/**").hasAnyAuthority(Role.ADMIN.name());
         http.authorizeRequests().antMatchers(GET, "/api/v1/admin/**").hasAnyAuthority(Role.ADMIN.name());
         http.authorizeRequests().anyRequest().authenticated();
