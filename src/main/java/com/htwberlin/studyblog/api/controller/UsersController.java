@@ -71,10 +71,10 @@ public class UsersController {
         }
     }
 
-    @PutMapping("/v1/admin/users")
-    public ResponseEntity<ApplicationUserEntity> updateUserByAdmin(HttpServletRequest request, HttpServletResponse response, @RequestBody ApplicationUserEntity updatedUser) throws IOException {
+    @PutMapping("/v1/admin/users/{id}")
+    public ResponseEntity<ApplicationUserEntity> updateUserByAdmin(HttpServletRequest request, HttpServletResponse response, @RequestBody ApplicationUserEntity updatedUser, @PathVariable String id) throws IOException {
         try {
-            var freshUpdatedUser = userService.updateUserByAdmin(request, response, updatedUser);
+            var freshUpdatedUser = userService.updateUserByAdmin(request, response, id, updatedUser);
             return ResponseEntity.status(HttpStatus.OK).body(freshUpdatedUser);
         } catch (AuthorizationServiceException exp) {
             HttpResponseWriter.writeJsonResponse(response, HttpResponseWriter.error(exp));
@@ -89,9 +89,9 @@ public class UsersController {
     }
 
     @DeleteMapping("/v1/admin/users/{id}")
-    public ResponseEntity<Void> deleteUserByAdmin(HttpServletResponse response, @PathVariable String id) throws IOException {
+    public ResponseEntity<Void> deleteUserByAdmin(HttpServletRequest request, HttpServletResponse response, @PathVariable String id) throws IOException {
         try {
-            userService.deleteUser(id);
+            userService.deleteUser(request, id);
             return ResponseEntity.status(HttpStatus.OK).build();
         } catch (AuthorizationServiceException exp) {
             HttpResponseWriter.writeJsonResponse(response, HttpResponseWriter.error(exp));

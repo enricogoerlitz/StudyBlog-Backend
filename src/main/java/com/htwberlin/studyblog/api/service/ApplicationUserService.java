@@ -1,6 +1,7 @@
 package com.htwberlin.studyblog.api.service;
 
 import com.htwberlin.studyblog.api.authentication.ApplicationJWT;
+import com.htwberlin.studyblog.api.authentication.Role;
 import com.htwberlin.studyblog.api.modelsEntity.ApplicationUserEntity;
 import com.htwberlin.studyblog.api.repository.ApplicationUserRepository;
 import com.htwberlin.studyblog.api.repository.BlogPostRepository;
@@ -8,6 +9,7 @@ import com.htwberlin.studyblog.api.repository.FavoriteRepository;
 import com.htwberlin.studyblog.api.utilities.PathVariableParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.postgresql.jdbc.PreferQueryMode;
 import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -99,16 +101,34 @@ public class ApplicationUserService implements UserDetailsService {
 
         var savedUpdatedUser = userRepository.save(dbUser);
         if(savedUpdatedUser == null) throw new Exception("User could not be updated!");
-        refreshUserToken(request, response, savedUpdatedUser);
 
-        return savedUpdatedUser; //userRepository.save(dbUser);
+        ApplicationJWT.refreshJWTCookie(request, response, savedUpdatedUser);
+
+        return savedUpdatedUser;
     }
 
-    public ApplicationUserEntity updateUserByAdmin(HttpServletRequest request, HttpServletResponse response, ApplicationUserEntity updatedUser) throws Exception {
-        var dbUser = userRepository.findById(updatedUser.getId());
-        if(dbUser.isEmpty()) throw new AuthorizationServiceException("User not found in DB!");
+    public ApplicationUserEntity updateUserByAdmin(HttpServletRequest request, HttpServletResponse response, String id, ApplicationUserEntity updatedUser) throws Exception {
+        Long dbUserId = PathVariableParser.parseLong(id);
+        var dbUser = userRepository.findById(dbUserId);
+        if(dbUser.isEmpty()) throw new IllegalArgumentException("User not found in DB!");
         var verifiedDbUser = dbUser.get();
 
+        // TODO: source out
+        if(verifiedDbUser.getRole().equals(Role.ADMIN.name())) {
+            var requestUser = ApplicationJWT.getUserFromJWT(request);
+            if(requestUser == null) throw new AuthorizationServiceException("JWT is invalid! You can't manipulate a admin-user, if you are not this user!");
+
+            var verifiedReqUser = userRepository.findByUsername(requestUser.getUsername());
+            if(verifiedReqUser == null) throw new AuthorizationServiceException("User not found in DB. You can't manipulate a admin-user, if you are not this user!");
+
+            if(verifiedDbUser.getId() != verifiedReqUser.getId())
+                throw new AuthorizationServiceException("You can't manipulate a admin user, if you are't this User!");
+
+            if(!verifiedDbUser.getRole().equals(verifiedReqUser.getRole()))
+                throw new Exception("You can't change the role of a admin-user!");
+        }
+
+        // TODO: source out
         if(!verifiedDbUser.getUsername().equals(updatedUser.getUsername())) {
             var isUsernameExisting = userRepository.findByUsername(updatedUser.getUsername());
             if(isUsernameExisting != null)
@@ -120,32 +140,29 @@ public class ApplicationUserService implements UserDetailsService {
         verifiedDbUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
         verifiedDbUser.setRole(updatedUser.getRole());
 
-        var savedUpdatedUser = userRepository.save(verifiedDbUser);
-        if(savedUpdatedUser == null) throw new Exception("User could not be updated!");
-        refreshUserToken(request, response, savedUpdatedUser);
-
-        return savedUpdatedUser;
+        return userRepository.save(verifiedDbUser);
     }
 
-    public void deleteUser(String id) {
+    public void deleteUser(HttpServletRequest request, String id) {
         Long userId = PathVariableParser.parseLong(id);
         var isUserExisting = userRepository.findById(userId);
         if(isUserExisting.isEmpty())
             throw new IllegalArgumentException("Could not delete the user. User was not found in the DB");
 
+        if(isUserExisting.get().getRole().equals(Role.ADMIN.name())) {
+            var requestUser = ApplicationJWT.getUserFromJWT(request);
+            if(requestUser == null)
+                throw new AuthorizationServiceException("JWT is invalid!");
+            var dbUser = userRepository.findByUsername(requestUser.getUsername());
+            if(dbUser == null)
+                throw new AuthorizationServiceException("User not found in DB");
+
+            if(dbUser.getId() != isUserExisting.get().getId())
+                throw new AuthorizationServiceException("You can't delete this admin-user! If a user has the role 'Admin', this user is the only one how can delete this user!");
+        }
+
         favoriteRepository.deleteAllByCreator_Id(userId);
         blogPostRepository.deleteAllByCreator_Id(userId);
         userRepository.deleteById(userId);
-    }
-
-    private void refreshUserToken(HttpServletRequest request, HttpServletResponse response, ApplicationUserEntity user) throws IOException {
-        log.warn("Here new refresh!");
-        ApplicationJWT.refreshJWTCookie(request, response, user);
-        /*
-        var authToken = new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
-        var authentication = authenticationManager.authenticate(authToken);
-        ApplicationJWT.refreshJWTCookie(request, response, authentication);
-
-         */
     }
 }
