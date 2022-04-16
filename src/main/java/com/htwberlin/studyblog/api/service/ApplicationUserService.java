@@ -2,6 +2,7 @@ package com.htwberlin.studyblog.api.service;
 
 import com.htwberlin.studyblog.api.helper.Transformer;
 import com.htwberlin.studyblog.api.models.ApplicationUserModel;
+import com.htwberlin.studyblog.api.modelsEntity.ApplicationUserEntity;
 import com.htwberlin.studyblog.api.repository.ApplicationUserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,10 +42,10 @@ public class ApplicationUserService implements UserDetailsService {
         );
     }
 
-    public ApplicationUserModel registerUser(ApplicationUserModel user) {
+    public ApplicationUserModel registerUser(ApplicationUserEntity user) {
         log.info("Saving new user to the db.");
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        var registeredUser = userRepository.save(Transformer.userModelToEntity(user));
+        var registeredUser = userRepository.save(user);
 
         return Transformer.userEntityToModel(registeredUser);
     }

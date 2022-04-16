@@ -32,8 +32,4 @@ public class ApplicationUserEntity {
 
     @Column(name = "role", nullable = false)
     private String role;
-
-    @OneToMany(mappedBy = "creator", fetch = FetchType.EAGER)
-    @Column(name = "blog_posts")
-    private List<BlogPostEntity> blogPosts = new ArrayList<>();
 }

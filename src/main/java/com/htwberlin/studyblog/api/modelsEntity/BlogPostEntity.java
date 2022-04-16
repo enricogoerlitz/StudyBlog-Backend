@@ -1,13 +1,15 @@
 package com.htwberlin.studyblog.api.modelsEntity;
 
-import com.htwberlin.studyblog.api.models.ApplicationUserModel;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Configuration;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /** TODO: implement BlogPostEntity with a Many-to-Many relationship to ApplicationUserEntity and FavouriteEntity
  *
@@ -34,7 +36,24 @@ public class BlogPostEntity {
     @Column(name = "last_edit_data")
     private Date lastEditDate;
 
-    @ManyToOne(cascade = CascadeType.MERGE)
+    @OneToOne
     @JoinColumn(name = "creator_id", referencedColumnName = "id")
     private ApplicationUserEntity creator;
+
+    @OneToMany(cascade = CascadeType.MERGE)
+    @JsonIgnore
+    private List<FavouriteEntity> favourites;
+
+    /*
+    public BlogPostEntity(Long id, String title, String content, Date creationDate, Date lastEditDate, ApplicationUserEntity creator) {
+        this.id = id;
+        this.title = title;
+        this.content = content;
+        this.creationDate = creationDate;
+        this.lastEditDate = lastEditDate;
+        this.creator = creator;
+        this.favourites = new ArrayList<>();
+    }
+
+     */
 }

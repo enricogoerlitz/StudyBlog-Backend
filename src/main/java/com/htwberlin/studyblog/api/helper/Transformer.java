@@ -6,6 +6,7 @@ import com.htwberlin.studyblog.api.models.BlogPostRequestModel;
 import com.htwberlin.studyblog.api.modelsEntity.ApplicationUserEntity;
 import com.htwberlin.studyblog.api.modelsEntity.BlogPostEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,8 +22,7 @@ public final class Transformer {
             userEntity.getId(),
             userEntity.getUsername(),
             userEntity.getPassword(),
-            userEntity.getRole(),
-            Transformer.blogPostEntityToModelList(userEntity.getBlogPosts())
+            userEntity.getRole()
         );
     }
 
@@ -32,10 +32,10 @@ public final class Transformer {
             userModel.getId(),
             userModel.getUsername(),
             userModel.getPassword(),
-            userModel.getRole(),
-            Transformer.blockPostModelToEntityList(userModel.getBlogPosts())
+            userModel.getRole()
         );
     }
+    /*
 
     public static List<BlogPostEntity> blockPostModelToEntityList(List<BlogPostModel> blogPosts) {
         if(blogPosts == null) return null;
@@ -83,6 +83,7 @@ public final class Transformer {
                 Transformer.userEntityToModel(blogPost.getCreator())
         );
     }
+     */
 
     public static BlogPostEntity blogPostRequestModelToEntity(BlogPostRequestModel blogPostRequest, ApplicationUserEntity user) {
         return new BlogPostEntity(
@@ -91,7 +92,9 @@ public final class Transformer {
                 blogPostRequest.getContent(),
                 blogPostRequest.getCreationDate(),
                 blogPostRequest.getLastEditDate(),
-                user
+                user,
+                null
         );
     }
+
 }

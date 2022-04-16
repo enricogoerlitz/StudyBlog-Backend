@@ -2,6 +2,7 @@ package com.htwberlin.studyblog.api.controller;
 
 import com.htwberlin.studyblog.api.authentication.Role;
 import com.htwberlin.studyblog.api.models.ApplicationUserModel;
+import com.htwberlin.studyblog.api.modelsEntity.ApplicationUserEntity;
 import com.htwberlin.studyblog.api.service.ApplicationUserService;
 import com.htwberlin.studyblog.api.utilities.Routes;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +39,7 @@ public class UsersController {
     }
 
     @PostMapping(Routes.USERS)
-    public ResponseEntity<ApplicationUserModel> registerUser(@RequestBody ApplicationUserModel user) {
+    public ResponseEntity<ApplicationUserModel> registerUser(@RequestBody ApplicationUserEntity user) {
         user.setRole(Role.STUDENT.name());
         var createdUser = userService.registerUser(user);
         if(createdUser == null) return ResponseEntity.badRequest().build();
@@ -47,7 +48,7 @@ public class UsersController {
     }
 
     @PostMapping(Routes.ADMIN_USERS)
-    public ResponseEntity<ApplicationUserModel> registerUserByAdmin(@RequestBody ApplicationUserModel user) {
+    public ResponseEntity<ApplicationUserModel> registerUserByAdmin(@RequestBody ApplicationUserEntity user) {
         var createdUser = userService.registerUser(user);
         if(createdUser == null) return ResponseEntity.badRequest().build();
 

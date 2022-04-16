@@ -22,7 +22,8 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 public class CustomAuthorizationFilter extends OncePerRequestFilter {
     private final List<String> excludesUrls = Arrays.asList(
         Routes.API + Routes.LOGIN,
-        Routes.API + Routes.AUTH + Routes.HELLO_WORLD
+        Routes.API + Routes.AUTH + Routes.HELLO_WORLD,
+        "/api/v1/users"
     );
 
     @Override

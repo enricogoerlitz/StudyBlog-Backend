@@ -39,7 +39,7 @@ public class BlogPostController {
     }
 
     @PostMapping(Routes.BLOGPOSTS)
-    public ResponseEntity<BlogPostModel> addBlogPost(@RequestBody BlogPostRequestModel blogPost) {
+    public ResponseEntity<BlogPostEntity> addBlogPost(@RequestBody BlogPostRequestModel blogPost) {
         var addedBlogPost = blogPostService.addBlogpost(blogPost);
         if(addedBlogPost == null) return ResponseEntity.badRequest().build();
 
@@ -48,7 +48,7 @@ public class BlogPostController {
 
     // TODO: save by creator.username == jwt.username => forbidden
     @PutMapping(Routes.BLOGPOSTS)
-    public ResponseEntity<BlogPostModel> updateBlogPost(@RequestBody BlogPostRequestModel blogPost) {
+    public ResponseEntity<BlogPostEntity> updateBlogPost(@RequestBody BlogPostRequestModel blogPost) {
         var updatedBlogPost = blogPostService.updateBlogPost(blogPost);
         if(updatedBlogPost == null) return ResponseEntity.badRequest().build();
 
@@ -56,7 +56,7 @@ public class BlogPostController {
     }
 
     @PutMapping(Routes.ADMIN_BLOGPOSTS)
-    public ResponseEntity<BlogPostModel> updateBlogPostByAdmin(@RequestBody BlogPostRequestModel blogPost) {
+    public ResponseEntity<BlogPostEntity> updateBlogPostByAdmin(@RequestBody BlogPostRequestModel blogPost) {
         var updatedBlogPost = blogPostService.updateBlogPost(blogPost);
         if(updatedBlogPost == null) return ResponseEntity.badRequest().build();
 

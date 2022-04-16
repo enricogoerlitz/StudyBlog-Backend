@@ -21,13 +21,13 @@ public final class ApplicationJWT {
     public static final String ROLE_KEY = "roles";
 
     // last number correspond to the minutes
-    private static final int expiredDuration = 1000 * 60 * 60;
+    private static final int expiredDuration = 1000 * 60 * 120;
 
     public static String createToken(HttpServletRequest request, Authentication authResult) {
         User user = (User)authResult.getPrincipal();
         return com.auth0.jwt.JWT.create()
                 .withSubject(user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 60 * 1000 * 10))
+                .withExpiresAt(new Date(System.currentTimeMillis() + expiredDuration))
                 .withIssuer(request.getRequestURL().toString())
                 .withClaim("roles", user.getAuthorities().stream().map(authority -> authority.getAuthority()).collect(Collectors.joining()))
                 .sign(Algorithm.HMAC256(ENV.getJWTSecret().getBytes()));

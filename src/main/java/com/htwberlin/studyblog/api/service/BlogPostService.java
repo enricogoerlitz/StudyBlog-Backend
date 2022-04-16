@@ -28,7 +28,7 @@ public class BlogPostService {
         return blogPosts;
     }
 
-    public BlogPostModel addBlogpost(BlogPostRequestModel blogPost) {
+    public BlogPostEntity addBlogpost(BlogPostRequestModel blogPost) {
         var user = userRepository.findById(blogPost.getCreatorId());
         if(user == null) return null;
         blogPost.setLastEditDate(new Date());
@@ -37,17 +37,16 @@ public class BlogPostService {
         var blogPostEntity = Transformer.blogPostRequestModelToEntity(blogPost, user.get());
         var savedBlogPost = blogPostrepository.save(blogPostEntity);
         log.info("blogpost added");
-        return Transformer.blogPostEntityToModel(savedBlogPost);
+        return savedBlogPost;
     }
 
-    public BlogPostModel addBlogpost(BlogPostModel blogPost) {
-        var blogPostEntity = Transformer.blogPostModelToEntity(blogPost);
-        var savedBlogPost = blogPostrepository.save(blogPostEntity);
+    public BlogPostEntity addBlogpost(BlogPostEntity blogPost) {
+        var savedBlogPost = blogPostrepository.save(blogPost);
         log.info("blogpost added");
-        return Transformer.blogPostEntityToModel(savedBlogPost);
+        return savedBlogPost;
     }
 
-    public BlogPostModel updateBlogPost(BlogPostRequestModel blogPost) {
+    public BlogPostEntity updateBlogPost(BlogPostRequestModel blogPost) {
         var user = userRepository.findById(blogPost.getCreatorId());
         if(user == null) return null;
 
@@ -55,7 +54,7 @@ public class BlogPostService {
         var blogPostEntity = Transformer.blogPostRequestModelToEntity(blogPost, user.get());
         var updatedBlogpost = blogPostrepository.save(blogPostEntity);
 
-        return Transformer.blogPostEntityToModel(updatedBlogpost);
+        return updatedBlogpost;
     }
 
     public void deleteBlogPost(Long id) {

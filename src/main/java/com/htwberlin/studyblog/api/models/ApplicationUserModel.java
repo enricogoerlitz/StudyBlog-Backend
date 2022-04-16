@@ -3,9 +3,6 @@ package com.htwberlin.studyblog.api.models;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 public class ApplicationUserModel {
@@ -13,5 +10,5 @@ public class ApplicationUserModel {
     private String username;
     private String password;
     private String role;
-    private List<BlogPostModel> blogPosts;
+    // private List<BlogPostModel> blogPosts;
 }
