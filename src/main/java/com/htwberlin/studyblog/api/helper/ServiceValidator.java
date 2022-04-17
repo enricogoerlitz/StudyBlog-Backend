@@ -3,7 +3,11 @@ package com.htwberlin.studyblog.api.helper;
 import com.htwberlin.studyblog.api.authentication.ApplicationJWT;
 import com.htwberlin.studyblog.api.models.ApplicationUserModel;
 import com.htwberlin.studyblog.api.modelsEntity.ApplicationUserEntity;
+import com.htwberlin.studyblog.api.modelsEntity.BlogPostEntity;
+import com.htwberlin.studyblog.api.modelsEntity.FavoritesEntity;
 import com.htwberlin.studyblog.api.repository.ApplicationUserRepository;
+import com.htwberlin.studyblog.api.repository.BlogPostRepository;
+import com.htwberlin.studyblog.api.repository.FavoriteRepository;
 import com.htwberlin.studyblog.api.utilities.ResponseEntityException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.access.AuthorizationServiceException;
@@ -11,6 +15,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import javax.naming.AuthenticationException;
 import javax.servlet.http.HttpServletRequest;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.htwberlin.studyblog.api.utilities.ResponseEntityException.*;
 
@@ -26,9 +33,9 @@ public final class ServiceValidator {
     public static ApplicationUserEntity getValidDbUserById(ApplicationUserRepository userRepository, Long id) throws Exception {
         var optionalUser = userRepository.findById(id);
         return (ApplicationUserEntity) getValidObjOrThrowException(
-                optionalUser.isEmpty() ? null : optionalUser.get(),
-                ILLEGAL_ARGUMENT_EXCEPTION,
-                "Could not find user with id " + id + " in the DB!"
+            optionalUser.isEmpty() ? null : optionalUser.get(),
+            ILLEGAL_ARGUMENT_EXCEPTION,
+            "Could not find user with id " + id + " in the DB!"
         );
     }
 
@@ -45,11 +52,32 @@ public final class ServiceValidator {
         return getValidDbUserByUsername(userRepository, requestUser.getUsername());
     }
 
+    public static List<FavoritesEntity> getValidUserFavoritesByRequest(HttpServletRequest request, FavoriteRepository favoriteRepository) throws Exception {
+        var user = getValidRequestUser(request);
+        var userFavorites = favoriteRepository.findAllByCreator_Username(user.getUsername());
+        return userFavorites == null ? new ArrayList<>() : userFavorites;
+    }
+
+    public static BlogPostEntity getValidBlogPostById(BlogPostRepository blogPostRepository, Long id) throws Exception {
+        var optionalBlogPost = blogPostRepository.findById(id);
+
+        return (BlogPostEntity) getValidObjOrThrowException(
+            optionalBlogPost.isEmpty() ? null : optionalBlogPost.get(),
+            EXCEPTION,
+            "Blogpost could not be found in DB!"
+        ) ;
+    }
+
     public static Object getValidObjOrThrowException(Object obj, ResponseEntityException exception, String exceptionMessage) throws Exception {
         if(obj == null)
             throwException(exception, "User not found in DB!");
 
         return obj;
+    }
+
+    public static void validateEqualUserIds(ApplicationUserEntity user1, ApplicationUserEntity user2, String exceptionMessage) {
+        if(user1.getId() != user2.getId())
+            throw new AuthorizationServiceException(exceptionMessage);
     }
 
     private static void throwException(ResponseEntityException exception, String exceptionMessage) throws Exception {

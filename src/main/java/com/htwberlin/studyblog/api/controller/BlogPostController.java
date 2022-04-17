@@ -47,7 +47,7 @@ public class BlogPostController {
     public ResponseEntity<BlogPostModel> updateBlogPost(HttpServletRequest request, HttpServletResponse response, @RequestBody BlogPostModel blogPost) {
         try {
             var updatedBlogPost = blogPostService.updateBlogPost(request, blogPost);
-            return ResponseEntity.status(HttpStatus.OK).body(updatedBlogPost);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(updatedBlogPost);
         } catch(AuthorizationServiceException exp) {
             return ResponseEntityExceptionManager.handleException(response, AUTHORIZATION_SERVICE_EXCEPTION, exp);
         } catch(Exception exp) {
@@ -59,7 +59,7 @@ public class BlogPostController {
     public ResponseEntity<BlogPostModel> updateBlogPostByAdmin(HttpServletResponse response, @RequestBody BlogPostModel blogPost) {
         try {
             var updatedBlogPost = blogPostService.updateBlogPostByAdmin(blogPost);
-            return ResponseEntity.status(HttpStatus.OK).body(updatedBlogPost);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(updatedBlogPost);
         } catch (Exception exp) {
             return ResponseEntityExceptionManager.handleException(response, EXCEPTION, exp);
         }
@@ -83,7 +83,7 @@ public class BlogPostController {
     public ResponseEntity<Void> deleteBlogPostByAdmin(HttpServletResponse response, @PathVariable String id) {
         try {
             blogPostService.deleteBlogPostByAdmin(id);
-            return ResponseEntity.status(HttpStatus.OK).build();
+            return ResponseEntity.status(HttpStatus.ACCEPTED).build();
         } catch(IllegalArgumentException exp) {
             return ResponseEntityExceptionManager.handleException(response, ILLEGAL_ARGUMENT_EXCEPTION, exp);
         } catch (Exception exp) {

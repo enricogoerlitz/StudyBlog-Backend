@@ -103,11 +103,11 @@ public class ApplicationUserService implements UserDetailsService {
      * Updates the logged user (from JWT-Token)
      * It updates the username and password, if they have changed.
      *
-     * @param request
-     * @param response
-     * @param updatedUser
+     * @param request http.request
+     * @param response http.response
+     * @param updatedUser the userdata, which should updated to the DB.
      * @return ApplicationUserModel
-     * @throws Exception
+     * @throws Exception exception handling
      */
     public ApplicationUserModel updateUser(HttpServletRequest request, HttpServletResponse response, ApplicationUserEntity updatedUser) throws Exception {
         // TODO: updateUser validate -> username, password, and role
@@ -135,11 +135,11 @@ public class ApplicationUserService implements UserDetailsService {
      * admins can't modify other admin, only themselves
      * admins can modify themselves, but can't remove/change there role to a student, visitor oder any other role
      *
-     * @param request
-     * @param id
-     * @param updatedUser
+     * @param request http.request
+     * @param id id of the user, which should be updated by a admin
+     * @param updatedUser the userdata, which should updated to the DB.
      * @return ApplicationUserEntity
-     * @throws Exception
+     * @throws Exception exception handling
      */
     public ApplicationUserModel updateUserByAdmin(HttpServletRequest request, String id, ApplicationUserEntity updatedUser) throws Exception {
         // TODO: updateUser validate -> username, password, and role
@@ -156,6 +156,15 @@ public class ApplicationUserService implements UserDetailsService {
         return Transformer.userEntityToModel(userRepository.save(manipulationDbUser));
     }
 
+    /**
+     * Admins can delete users, incl. themselves
+     * But Admins can't delete other admin-user
+     * Deletes all references to this userId in the DB
+     *
+     * @param request http.request
+     * @param id id of the user, which should be deleted
+     * @throws Exception exception handling
+     */
     public void deleteUser(HttpServletRequest request, String id) throws Exception {
         Long userId = PathVariableParser.parseLong(id);
         var delDbUser = ServiceValidator.getValidDbUserById(userRepository, userId);
@@ -206,8 +215,11 @@ public class ApplicationUserService implements UserDetailsService {
     }
 
     private void validateManipulationDbUserIsRequestUser(ApplicationUserEntity manipulationDbUser, ApplicationUserEntity requestUser) {
-        if(manipulationDbUser.getId() != requestUser.getId())
-            throw new AuthorizationServiceException("You can't manipulate a admin-user, if you aren't this User!");
+        ServiceValidator.validateEqualUserIds(
+                manipulationDbUser,
+                requestUser,
+                "You can't manipulate a admin-user, if you aren't this User!"
+        );
     }
 
     private void validateManipulationUserHasNotChangedRole(ApplicationUserEntity manipulationDbUser, ApplicationUserEntity updatedUser) throws Exception {
