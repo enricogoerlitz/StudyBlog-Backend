@@ -1,10 +1,6 @@
 package com.htwberlin.studyblog.api.controller;
 
-import com.htwberlin.studyblog.api.helper.ServiceValidator;
-import com.htwberlin.studyblog.api.helper.Transformer;
 import com.htwberlin.studyblog.api.models.ApplicationUserModel;
-import com.htwberlin.studyblog.api.repository.ApplicationUserRepository;
-import com.htwberlin.studyblog.api.service.ApplicationUserService;
 import com.htwberlin.studyblog.api.service.AuthService;
 import com.htwberlin.studyblog.api.utilities.ResponseEntityExceptionManager;
 import com.htwberlin.studyblog.api.utilities.Routes;
@@ -29,7 +25,6 @@ import static com.htwberlin.studyblog.api.utilities.ResponseEntityException.AUTH
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(Routes.API + Routes.V1 + Routes.AUTH)
-@Slf4j
 public class AuthController {
     private final AuthService authService;
 

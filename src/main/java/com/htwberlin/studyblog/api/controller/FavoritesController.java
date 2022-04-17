@@ -22,7 +22,6 @@ import static com.htwberlin.studyblog.api.utilities.ResponseEntityException.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(Routes.API)
-@Slf4j
 public class FavoritesController {
     private final FavoritesService favoritesService;
 

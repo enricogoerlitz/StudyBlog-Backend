@@ -21,7 +21,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Slf4j
 public class BlogPostService {
     private final BlogPostRepository blogPostRepository;
     private final ApplicationUserRepository userRepository;
@@ -42,7 +41,6 @@ public class BlogPostService {
         var blogPostEntity = Transformer.blogPostModelToEntity(blogPost, requestUser);
         var savedBlogPost = blogPostRepository.save(blogPostEntity);
 
-        log.info("blogpost added");
         return Transformer.blogPostEntityToModel(savedBlogPost, false);
     }
 
@@ -92,10 +90,6 @@ public class BlogPostService {
         Long blogPostId = PathVariableParser.parseLong(id);
         deleteAllFavoritesFKs(blogPostId);
         blogPostRepository.deleteById(blogPostId);
-    }
-
-    private BlogPostModel saveUpdatedBlogPost(BlogPostModel blogPost, ApplicationUserEntity user) {
-        return saveUpdatedBlogPost(Transformer.blogPostModelToEntity(blogPost, user));
     }
 
     private BlogPostModel saveUpdatedBlogPost(BlogPostEntity blogPost) {

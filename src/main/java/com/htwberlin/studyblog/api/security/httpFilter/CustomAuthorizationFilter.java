@@ -45,7 +45,6 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
             return;
         }
 
-        log.info("jwt token is valid!");
         SecurityContextHolder.getContext().setAuthentication(tokenValidation.getAuthenticationToken());
         filterChain.doFilter(request, response);
     }

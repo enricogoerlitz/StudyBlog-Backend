@@ -11,7 +11,6 @@ import com.htwberlin.studyblog.api.utilities.Validator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public final class Transformer {
 
@@ -57,11 +56,6 @@ public final class Transformer {
             Transformer.userEntityToModel(favoritesEntity.getCreator()),
             favoritesEntity.getBlogPost().getId()
         );
-    }
-
-    public static List<FavoritesModel> favoritesEntitiesToModels(List<FavoritesEntity> favoritesEntities) {
-        if(favoritesEntities == null || favoritesEntities.size() == 0) return new ArrayList<>();
-        return favoritesEntities.stream().map(Transformer::favoritesEntityToModel).toList();
     }
 
     public static BlogPostEntity blogPostModelToEntity(BlogPostModel blogPostRequest, ApplicationUserEntity user) {

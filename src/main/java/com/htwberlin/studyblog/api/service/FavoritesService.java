@@ -22,7 +22,6 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Slf4j
 public class FavoritesService {
     private final FavoriteRepository favouritesRepository;
     private final ApplicationUserRepository userRepository;

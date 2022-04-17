@@ -40,7 +40,7 @@ public class ApplicationUserService implements UserDetailsService {
     /** loadUserByUsername
      * Overrides a method fpr user-authentication. By request to /api/v1/login
      * the authentication-process gets triggered and trys to find a user in the DB by username
-     * If the method can find a user by his username in the DB, its return a auth-user
+     * If the method can find a user by his username in the DB, its return an auth-user
      * otherwise it throws an error (UsernameNotFoundException)
      *
      * @param username username of the post-param 'username'
@@ -55,7 +55,6 @@ public class ApplicationUserService implements UserDetailsService {
             throw new UsernameNotFoundException("User not found");
         }
 
-        log.info("User with username {} found!", username);
         return new User(
             existingUser.getUsername(),
             existingUser.getPassword(),
@@ -92,7 +91,6 @@ public class ApplicationUserService implements UserDetailsService {
      */
     public ApplicationUserModel registerUser(ApplicationUserEntity user) throws Exception {
         validateRole(user.getRole());
-        log.info("Saving new user to the db.");
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return Transformer.userEntityToModel(userRepository.save(user));
     }
@@ -105,7 +103,7 @@ public class ApplicationUserService implements UserDetailsService {
      * @param response http.response
      * @param updatedUser the userdata, which should updated to the DB.
      * @return ApplicationUserModel
-     * @throws Exception exception handling
+     * @throws Exception handling exception
      */
     public ApplicationUserModel updateUser(HttpServletRequest request, HttpServletResponse response, ApplicationUserEntity updatedUser) throws Exception {
         var manipulationDbUser = ServiceValidator.getValidDbUserFromRequest(request, userRepository);
@@ -134,10 +132,10 @@ public class ApplicationUserService implements UserDetailsService {
      * admins can modify themselves, but can't remove/change there role to a student, visitor oder any other role
      *
      * @param request http.request
-     * @param id id of the user, which should be updated by a admin
+     * @param id id of the user, which should be updated by an admin
      * @param updatedUser the userdata, which should updated to the DB.
      * @return ApplicationUserEntity
-     * @throws Exception exception handling
+     * @throws Exception handling exception
      */
     public ApplicationUserModel updateUserByAdmin(HttpServletRequest request, String id, ApplicationUserEntity updatedUser) throws Exception {
         Long dbUserId = PathVariableParser.parseLong(id);
@@ -160,7 +158,7 @@ public class ApplicationUserService implements UserDetailsService {
      *
      * @param request http.request
      * @param id id of the user, which should be deleted
-     * @throws Exception exception handling
+     * @throws Exception handling exception
      */
     public void deleteUser(HttpServletRequest request, String id) throws Exception {
         Long userId = PathVariableParser.parseLong(id);

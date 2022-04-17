@@ -4,7 +4,6 @@ import com.htwberlin.studyblog.api.helper.ServiceValidator;
 import com.htwberlin.studyblog.api.helper.Transformer;
 import com.htwberlin.studyblog.api.models.ApplicationUserModel;
 import com.htwberlin.studyblog.api.repository.ApplicationUserRepository;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -21,8 +21,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-@Slf4j
 @SpringBootApplication
+@Slf4j
 public class StudyblogApplication {
 
 	public static void main(String[] args) {
@@ -31,22 +31,20 @@ public class StudyblogApplication {
 
 	@Bean
 	CommandLineRunner run(ApplicationUserService userService, BlogPostService blogPostService, FavoritesService favouriteService) {
-		log.warn(Boolean.toString(blogPostService == null));
 		return args -> {
-			getInitUsers().stream().forEach(user -> {
+			getInitUsers().forEach(user -> {
 				try {
 					userService.registerUser(user);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				getInitUserBlogPosts(user, 4).stream().forEach(post -> {
+				getInitUserBlogPosts(user, 4).forEach(post -> {
 					var addedPost = blogPostService.addBlogpostDEV(post);
-					getInitFavourites(user, addedPost).forEach(fav -> {
-						var f = favouriteService.addFavoriteDEV(user, addedPost);
-						log.warn("is favourite added: " + Boolean.toString(f != null));
-					});
+					getInitFavourites(user, addedPost).forEach(fav -> favouriteService.addFavoriteDEV(user, addedPost));
 				});
+				log.info("User " + user.getUsername() + " (" + user.getRole() + ") added to DB.");
 			});
+			log.info("✅ ✅ ✅  !>>>>>  🥳 APPLICATION READY 🥳  <<<<<!  ✅ ✅ ✅");
 		};
 	}
 
@@ -68,7 +66,7 @@ public class StudyblogApplication {
 		for(int i = 0; i < postCounts; i++) {
 			posts.add(new BlogPostEntity(
 				null,
-				"Blogpost" + i + " - " + user.getUsername(),
+				"Blogpost" + i + " from user: " + user.getUsername(),
 				"Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et.",
 				new Date(),
 				null,
@@ -82,6 +80,6 @@ public class StudyblogApplication {
 
 	private List<FavoritesEntity> getInitFavourites(ApplicationUserEntity user, BlogPostEntity blogPost) {
 		var fav1 = new FavoritesEntity(null, user, blogPost);
-		return Arrays.asList(fav1);
+		return List.of(fav1);
 	}
 }

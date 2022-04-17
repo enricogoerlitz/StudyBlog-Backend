@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 import static java.util.Arrays.stream;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
-@Slf4j
 public final class ApplicationJWT {
     public static final String JWT_KEY_STUDYBLOG = "studyblog_jwt";
     public static final String BEARER_PREFIX = "Bearer ";
@@ -131,7 +130,6 @@ public final class ApplicationJWT {
             if(cookie.getName().equals(JWT_KEY_STUDYBLOG)) {
                 cookie.setValue(jwtToken);
                 response.addCookie(cookie);
-                log.info("Token refreshed");
             }
         }
     }

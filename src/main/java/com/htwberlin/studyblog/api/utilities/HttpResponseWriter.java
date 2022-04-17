@@ -13,7 +13,7 @@ public final class HttpResponseWriter {
         response.setContentType(APPLICATION_JSON_VALUE);
         try {
             new ObjectMapper().writeValue(response.getOutputStream(), writingMap);
-        } catch (IOException e) {}
+        } catch (IOException ignored) {}
     }
 
     public static Map<String, String> error(Exception exp) {

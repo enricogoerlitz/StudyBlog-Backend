@@ -21,7 +21,6 @@ import static com.htwberlin.studyblog.api.utilities.ResponseEntityException.*;
 @RestController
 @RequestMapping(Routes.API)
 @RequiredArgsConstructor
-@Slf4j
 public class BlogPostController {
     private final BlogPostService blogPostService;
 
