@@ -75,7 +75,7 @@ public class UsersController {
     @PutMapping(Routes.USERS_ADMIN_ID)
     public ResponseEntity<ApplicationUserModel> updateUserByAdmin(HttpServletRequest request, HttpServletResponse response, @RequestBody ApplicationUserEntity updatedUser, @PathVariable String id) {
         try {
-            var freshUpdatedUser = userService.updateUserByAdmin(request, response, id, updatedUser);
+            var freshUpdatedUser = userService.updateUserByAdmin(request, id, updatedUser);
             return ResponseEntity.status(HttpStatus.OK).body(freshUpdatedUser);
         } catch (AuthorizationServiceException exp) {
             return ResponseEntityExceptionManager.handleException(response, AUTHORIZATION_SERVICE_EXCEPTION, exp);
@@ -90,7 +90,7 @@ public class UsersController {
     public ResponseEntity<Void> deleteUserByAdmin(HttpServletRequest request, HttpServletResponse response, @PathVariable String id) {
         try {
             userService.deleteUser(request, id);
-            return ResponseEntity.status(HttpStatus.OK).build();
+            return ResponseEntity.status(HttpStatus.ACCEPTED).build();
         } catch (AuthorizationServiceException exp) {
             return ResponseEntityExceptionManager.handleException(response, AUTHORIZATION_SERVICE_EXCEPTION, exp);
         } catch (IllegalArgumentException exp) {

@@ -12,8 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import javax.naming.AuthenticationException;
 import javax.servlet.http.HttpServletRequest;
 
-import static com.htwberlin.studyblog.api.utilities.ResponseEntityException.AUTHORIZATION_SERVICE_EXCEPTION;
-import static com.htwberlin.studyblog.api.utilities.ResponseEntityException.USERNAME_NOT_FOUND_EXCEPTION;
+import static com.htwberlin.studyblog.api.utilities.ResponseEntityException.*;
 
 public final class ServiceValidator {
     public static ApplicationUserModel getValidRequestUser(HttpServletRequest request) throws Exception {
@@ -21,6 +20,15 @@ public final class ServiceValidator {
             ApplicationJWT.getUserFromJWT(request),
             AUTHORIZATION_SERVICE_EXCEPTION,
             "JWT-Token was not valid!"
+        );
+    }
+
+    public static ApplicationUserEntity getValidDbUserById(ApplicationUserRepository userRepository, Long id) throws Exception {
+        var optionalUser = userRepository.findById(id);
+        return (ApplicationUserEntity) getValidObjOrThrowException(
+                optionalUser.isEmpty() ? null : optionalUser.get(),
+                ILLEGAL_ARGUMENT_EXCEPTION,
+                "Could not find user with id " + id + " in the DB!"
         );
     }
 
@@ -38,7 +46,8 @@ public final class ServiceValidator {
     }
 
     public static Object getValidObjOrThrowException(Object obj, ResponseEntityException exception, String exceptionMessage) throws Exception {
-        if(obj == null) throwException(exception, "User not found in DB!");
+        if(obj == null)
+            throwException(exception, "User not found in DB!");
 
         return obj;
     }
