@@ -19,8 +19,4 @@ public final class HttpResponseWriter {
     public static Map<String, String> error(Exception exp) {
         return Map.of("error_msg", exp.getMessage());
     }
-
-    public static Map<String, String> error(String exceptionMessage) {
-        return Map.of("error_msg", exceptionMessage);
-    }
 }

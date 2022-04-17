@@ -18,6 +18,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.htwberlin.studyblog.api.utilities.ResponseEntityException.*;
 
@@ -52,10 +54,24 @@ public final class ServiceValidator {
         return getValidDbUserByUsername(userRepository, requestUser.getUsername());
     }
 
-    public static List<FavoritesEntity> getValidUserFavoritesByRequest(HttpServletRequest request, FavoriteRepository favoriteRepository) throws Exception {
+    public static List<FavoritesEntity> getValidUserFavoriteBlogPostsByRequest(HttpServletRequest request, FavoriteRepository favoriteRepository) throws Exception {
         var user = getValidRequestUser(request);
         var userFavorites = favoriteRepository.findAllByCreator_Username(user.getUsername());
         return userFavorites == null ? new ArrayList<>() : userFavorites;
+    }
+
+    public static FavoritesEntity getValidFavoriteByBlogPostIdAndRequestUser(HttpServletRequest request, ApplicationUserRepository userRepository, FavoriteRepository favoriteRepository, Long blogPostId) throws Exception {
+        var requestUser = ServiceValidator.getValidDbUserFromRequest(request, userRepository);
+
+        return (FavoritesEntity) getValidObjOrThrowException(
+                favoriteRepository.findByBlogPost_IdAndCreator_Id(blogPostId, requestUser.getId()),
+                ILLEGAL_ARGUMENT_EXCEPTION,
+                "Could not find the favorite of this user to the blogpost in the DB!"
+        );
+    }
+
+    public static Set<Long> getValidUserFavoriteBlogPostsByRequestAsSet(HttpServletRequest request, FavoriteRepository favoriteRepository) throws Exception {
+        return getValidUserFavoriteBlogPostsByRequest(request, favoriteRepository).stream().map(fav -> fav.getBlogPost().getId()).collect(Collectors.toSet());
     }
 
     public static BlogPostEntity getValidBlogPostById(BlogPostRepository blogPostRepository, Long id) throws Exception {
@@ -70,7 +86,7 @@ public final class ServiceValidator {
 
     public static Object getValidObjOrThrowException(Object obj, ResponseEntityException exception, String exceptionMessage) throws Exception {
         if(obj == null)
-            throwException(exception, "User not found in DB!");
+            throwException(exception, exceptionMessage);
 
         return obj;
     }

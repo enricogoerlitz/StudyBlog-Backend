@@ -16,8 +16,4 @@ public final class ENV {
     public static String getStudentPassword() {
         return System.getenv().get("STUDENT_PW");
     }
-
-    public static String getVisitorPassword() {
-        return System.getenv().get("VISITOR_PW");
-    }
 }

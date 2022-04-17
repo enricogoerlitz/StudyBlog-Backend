@@ -1,8 +1,5 @@
 package com.htwberlin.studyblog.api.utilities;
 
-/** TODO: implement a central route management
- *
- */
 public final class Routes {
     public static final String API = "/api";
     public static final String V1 = "/v1";

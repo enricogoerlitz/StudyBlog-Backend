@@ -28,7 +28,7 @@ public class BlogPostService {
     private final FavoriteRepository favoriteRepository;
 
     public List<BlogPostModel> getBlogPosts(HttpServletRequest request) throws Exception {
-        var userFavorites = ServiceValidator.getValidUserFavoritesByRequest(request, favoriteRepository);
+        var userFavorites = ServiceValidator.getValidUserFavoriteBlogPostsByRequestAsSet(request, favoriteRepository);
         return Transformer.blogPostEntitiesToModels(blogPostRepository.findAll(), userFavorites);
     }
 

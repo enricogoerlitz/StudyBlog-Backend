@@ -41,7 +41,7 @@ public class FavoritesController {
     @PostMapping(Routes.FAVORITES_ID)
     public ResponseEntity<FavoritesModel> addFavoriteToUser(HttpServletRequest request, HttpServletResponse response, @PathVariable String id) {
         try {
-            var addedFavorite = favoritesService.addFavourite(request, id);
+            var addedFavorite = favoritesService.addFavorite(request, id);
             return ResponseEntity.status(HttpStatus.CREATED).body(addedFavorite);
         } catch (AuthenticationException exp) {
             return ResponseEntityExceptionManager.handleException(response, AUTHORIZATION_SERVICE_EXCEPTION, exp);
@@ -52,6 +52,13 @@ public class FavoritesController {
         }
     }
 
+    /**
+     *
+     * @param request
+     * @param response
+     * @param id blogPostId
+     * @return
+     */
     @DeleteMapping(Routes.FAVORITES_ID)
     public ResponseEntity<Void> deleteFavorite(HttpServletRequest request, HttpServletResponse response, @PathVariable String id) {
         try {

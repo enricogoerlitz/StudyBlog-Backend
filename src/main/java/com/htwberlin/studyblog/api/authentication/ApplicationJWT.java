@@ -76,8 +76,6 @@ public final class ApplicationJWT {
 
     public static String getTokenFromRequestHeader(HttpServletRequest request) {
         String authHeader = request.getHeader(AUTHORIZATION);
-
-        log.info("Validate JWT-Token by Authorization-Header.");
         return authHeader == null ? null : removeBearerPrefix(authHeader);
     }
 
@@ -85,7 +83,6 @@ public final class ApplicationJWT {
         var jwtCookies = getJWTCookies(request);
         if(jwtCookies == null || jwtCookies.size() == 0) return null;
 
-        log.info("Validate JWT-Token by Request-Cookie.");
         return jwtCookies.get(0).getValue();
     }
 
@@ -115,14 +112,12 @@ public final class ApplicationJWT {
         String jwtToken = createToken(request, authResult);
         addJWTCookie(request, response, jwtToken);
         HttpResponseWriter.writeJsonResponse(response, Map.of(ApplicationJWT.JWT_KEY_STUDYBLOG, jwtToken));
-        log.info("JWT-Token initialized.");
     }
 
     public static void refreshJWTCookie(HttpServletRequest request, HttpServletResponse response, ApplicationUserEntity user) {
         String jwtToken = createRefreshedToken(request, user);
         addJWTCookie(request, response, jwtToken);
         HttpResponseWriter.writeJsonResponse(response, Map.of(ApplicationJWT.JWT_KEY_STUDYBLOG, jwtToken));
-        log.info("JWT-Token refreshed.");
     }
 
     private static void addJWTCookie(HttpServletRequest request, HttpServletResponse response, String jwtToken) {

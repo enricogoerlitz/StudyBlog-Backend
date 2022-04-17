@@ -44,10 +44,9 @@ public final class Transformer {
         );
     }
 
-    public static List<BlogPostModel> blogPostEntitiesToModels(List<BlogPostEntity> blogPostEntities, List<FavoritesEntity> favoritesEntities) {
+    public static List<BlogPostModel> blogPostEntitiesToModels(List<BlogPostEntity> blogPostEntities, Set<Long> favoritesEntities) {
         Validator.validateNotNullObject(blogPostEntities);
-        Set<Long> isFavoriteSet = favoritesEntities.stream().map(fav -> fav.getBlogPost().getId()).collect(Collectors.toSet());
-        return blogPostEntities.stream().map(blogPost -> blogPostEntityToModel(blogPost, isFavoriteSet.contains(blogPost.getId()))).toList();
+        return blogPostEntities.stream().map(blogPost -> blogPostEntityToModel(blogPost, favoritesEntities.contains(blogPost.getId()))).toList();
     }
 
     public static FavoritesModel favoritesEntityToModel(FavoritesEntity favoritesEntity) {
