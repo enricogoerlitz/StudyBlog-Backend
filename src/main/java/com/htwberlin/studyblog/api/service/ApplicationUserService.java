@@ -12,7 +12,6 @@ import com.htwberlin.studyblog.api.repository.FavoriteRepository;
 import com.htwberlin.studyblog.api.utilities.PathVariableParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -80,8 +79,7 @@ public class ApplicationUserService implements UserDetailsService {
      * @param initialRole The role, what the user should get
      * @return ApplicationUserModel
      */
-    public ApplicationUserModel registerUser(ApplicationUserEntity user, String initialRole) {
-        // TODO: validate username, password, and initialRole
+    public ApplicationUserModel registerUser(ApplicationUserEntity user, String initialRole) throws Exception {
         user.setRole(initialRole);
         return registerUser(user);
     }
@@ -92,8 +90,8 @@ public class ApplicationUserService implements UserDetailsService {
      * @param user The userdata, which should be registered (by admin, incl. role)
      * @return ApplicationUserModel
      */
-    public ApplicationUserModel registerUser(ApplicationUserEntity user) {
-        // TODO: validate username, password, and role
+    public ApplicationUserModel registerUser(ApplicationUserEntity user) throws Exception {
+        validateRole(user.getRole());
         log.info("Saving new user to the db.");
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return Transformer.userEntityToModel(userRepository.save(user));
@@ -110,8 +108,8 @@ public class ApplicationUserService implements UserDetailsService {
      * @throws Exception exception handling
      */
     public ApplicationUserModel updateUser(HttpServletRequest request, HttpServletResponse response, ApplicationUserEntity updatedUser) throws Exception {
-        // TODO: updateUser validate -> username, password, and role
         var manipulationDbUser = ServiceValidator.getValidDbUserFromRequest(request, userRepository);
+        validateRole(manipulationDbUser.getRole());
         updatedUser.setId(manipulationDbUser.getId());
         updatedUser.setRole(manipulationDbUser.getRole());
         changeUsername(manipulationDbUser, updatedUser);
@@ -142,7 +140,6 @@ public class ApplicationUserService implements UserDetailsService {
      * @throws Exception exception handling
      */
     public ApplicationUserModel updateUserByAdmin(HttpServletRequest request, String id, ApplicationUserEntity updatedUser) throws Exception {
-        // TODO: updateUser validate -> username, password, and role
         Long dbUserId = PathVariableParser.parseLong(id);
         var manipulationDbUser = ServiceValidator.getValidDbUserById(userRepository, dbUserId);
 
@@ -178,7 +175,6 @@ public class ApplicationUserService implements UserDetailsService {
     }
 
     private void changeUsername(ApplicationUserEntity manipulationDbUser, ApplicationUserEntity updatedUser) {
-        // TODO: validate username
         if(manipulationDbUser.getUsername().equals(updatedUser.getUsername())) return;
 
         var isUsernameExisting = userRepository.findByUsername(updatedUser.getUsername());
@@ -189,13 +185,12 @@ public class ApplicationUserService implements UserDetailsService {
     }
 
     private void changePassword(ApplicationUserEntity manipulationDbUser, ApplicationUserEntity updatedUser) {
-        // TODO: validate password
         manipulationDbUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
     }
 
-    private void changeRole(ApplicationUserEntity manipulationDbUser, ApplicationUserEntity updatedUser) {
-        // TODO: validate role
+    private void changeRole(ApplicationUserEntity manipulationDbUser, ApplicationUserEntity updatedUser) throws Exception {
         if(updatedUser.getRole() == null) return;
+        validateRole(updatedUser.getRole());
         manipulationDbUser.setRole(updatedUser.getRole());
     }
 
@@ -225,5 +220,12 @@ public class ApplicationUserService implements UserDetailsService {
     private void validateManipulationUserHasNotChangedRole(ApplicationUserEntity manipulationDbUser, ApplicationUserEntity updatedUser) throws Exception {
         if(!manipulationDbUser.getRole().equals(updatedUser.getRole()) && updatedUser.getRole() != null)
             throw new Exception("You can't change the role of a admin-user! Admin-Role can't be removed.");
+    }
+
+    private void validateRole(String role) throws Exception {
+        for(Role validRole : Role.values()) {
+            if(role.equals(validRole.name())) return;
+        }
+        throw new Exception("The entered role is not valid! Please enter a valid role.");
     }
 }

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.util.List;
 
 import static com.htwberlin.studyblog.api.utilities.ResponseEntityException.*;
@@ -39,7 +40,7 @@ public class UsersController {
     }
 
     @PostMapping(Routes.USERS)
-    public ResponseEntity<ApplicationUserModel> registerUser(HttpServletResponse response, @RequestBody ApplicationUserEntity newUser) {
+    public ResponseEntity<ApplicationUserModel> registerUser(HttpServletResponse response, @Valid @RequestBody ApplicationUserEntity newUser) {
         try {
             var createdUser = userService.registerUser(newUser, Role.STUDENT.name());
             return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
@@ -49,7 +50,7 @@ public class UsersController {
     }
 
     @PostMapping(Routes.ADMIN_USERS)
-    public ResponseEntity<ApplicationUserModel> registerUserByAdmin(HttpServletResponse response, @RequestBody ApplicationUserEntity newUser) {
+    public ResponseEntity<ApplicationUserModel> registerUserByAdmin(HttpServletResponse response, @Valid @RequestBody ApplicationUserEntity newUser) {
         try {
             var createdUser = userService.registerUser(newUser);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
@@ -59,7 +60,7 @@ public class UsersController {
     }
 
     @PutMapping(Routes.USERS_EDIT)
-    public ResponseEntity<ApplicationUserModel> updateUser(HttpServletRequest request, HttpServletResponse response, @RequestBody ApplicationUserEntity updatedUser) {
+    public ResponseEntity<ApplicationUserModel> updateUser(HttpServletRequest request, HttpServletResponse response, @Valid @RequestBody ApplicationUserEntity updatedUser) {
         try {
             var freshUpdatedUser = userService.updateUser(request, response, updatedUser);
             return ResponseEntity.status(HttpStatus.OK).body(freshUpdatedUser);
@@ -73,7 +74,7 @@ public class UsersController {
     }
 
     @PutMapping(Routes.USERS_ADMIN_ID)
-    public ResponseEntity<ApplicationUserModel> updateUserByAdmin(HttpServletRequest request, HttpServletResponse response, @RequestBody ApplicationUserEntity updatedUser, @PathVariable String id) {
+    public ResponseEntity<ApplicationUserModel> updateUserByAdmin(HttpServletRequest request, HttpServletResponse response, @Valid @RequestBody ApplicationUserEntity updatedUser, @PathVariable String id) {
         try {
             var freshUpdatedUser = userService.updateUserByAdmin(request, id, updatedUser);
             return ResponseEntity.status(HttpStatus.OK).body(freshUpdatedUser);

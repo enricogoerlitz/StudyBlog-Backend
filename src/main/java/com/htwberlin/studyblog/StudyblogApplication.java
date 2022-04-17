@@ -34,7 +34,11 @@ public class StudyblogApplication {
 		log.warn(Boolean.toString(blogPostService == null));
 		return args -> {
 			getInitUsers().stream().forEach(user -> {
-				userService.registerUser(user);
+				try {
+					userService.registerUser(user);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 				getInitUserBlogPosts(user, 4).stream().forEach(post -> {
 					var addedPost = blogPostService.addBlogpostDEV(post);
 					getInitFavourites(user, addedPost).forEach(fav -> {

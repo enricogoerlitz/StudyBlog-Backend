@@ -22,7 +22,7 @@ public class BlogPostEntity {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "content", nullable = false, length = 1500)
+    @Column(name = "content", nullable = false, length = 3000)
     private String content;
 
     @Column(name = "create_date", nullable = false)

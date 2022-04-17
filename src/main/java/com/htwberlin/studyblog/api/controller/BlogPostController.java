@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.util.List;
 
 import static com.htwberlin.studyblog.api.utilities.ResponseEntityException.*;
@@ -34,7 +35,7 @@ public class BlogPostController {
     }
 
     @PostMapping(Routes.BLOGPOSTS)
-    public ResponseEntity<BlogPostModel> addBlogPost(HttpServletRequest request, HttpServletResponse response, @RequestBody BlogPostModel blogPost) {
+    public ResponseEntity<BlogPostModel> addBlogPost(HttpServletRequest request, HttpServletResponse response, @Valid @RequestBody BlogPostModel blogPost) {
         try {
             var addedBlogPost = blogPostService.addBlogpost(request, blogPost);
             return ResponseEntity.status(HttpStatus.CREATED).body(addedBlogPost);
@@ -44,7 +45,7 @@ public class BlogPostController {
     }
 
     @PutMapping(Routes.BLOGPOSTS)
-    public ResponseEntity<BlogPostModel> updateBlogPost(HttpServletRequest request, HttpServletResponse response, @RequestBody BlogPostModel blogPost) {
+    public ResponseEntity<BlogPostModel> updateBlogPost(HttpServletRequest request, HttpServletResponse response, @Valid @RequestBody BlogPostModel blogPost) {
         try {
             var updatedBlogPost = blogPostService.updateBlogPost(request, blogPost);
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(updatedBlogPost);
@@ -56,7 +57,7 @@ public class BlogPostController {
     }
 
     @PutMapping(Routes.ADMIN_BLOGPOSTS)
-    public ResponseEntity<BlogPostModel> updateBlogPostByAdmin(HttpServletResponse response, @RequestBody BlogPostModel blogPost) {
+    public ResponseEntity<BlogPostModel> updateBlogPostByAdmin(HttpServletResponse response, @Valid @RequestBody BlogPostModel blogPost) {
         try {
             var updatedBlogPost = blogPostService.updateBlogPostByAdmin(blogPost);
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(updatedBlogPost);

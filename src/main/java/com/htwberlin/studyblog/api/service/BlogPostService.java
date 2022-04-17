@@ -51,7 +51,6 @@ public class BlogPostService {
     }
 
     public BlogPostModel updateBlogPost(HttpServletRequest request, BlogPostModel blogPost) throws Exception {
-        // TODO: validate blogpost data (title and content)
         var dbBlogPost = getValidBlogPost(blogPost.getId());
         var dbBlogPostCreator = getValidDbBlogPostCreator(dbBlogPost.getCreator().getId());
         var requestUser = getValidDbRequestUser(request);
@@ -68,7 +67,6 @@ public class BlogPostService {
     }
 
     public BlogPostModel updateBlogPostByAdmin(BlogPostModel blogPost) throws Exception {
-        // TODO: validate blogpost data (title and content)
         var dbBlogPost = getValidBlogPost(blogPost.getId());
         updateTitleAndContentOfBlogPost(dbBlogPost, blogPost);
 
