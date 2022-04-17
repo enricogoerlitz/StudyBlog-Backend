@@ -25,7 +25,8 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
         Routes.API + Routes.LOGIN,
         Routes.API + Routes.AUTH + Routes.HELLO_WORLD,
         "/api/v1/users",
-        "/api/v1/auth/"
+        "/api/v1/auth/",
+        "/api/v1/auth/logout"
     );
 
     @Override

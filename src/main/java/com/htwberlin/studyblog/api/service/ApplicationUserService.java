@@ -28,6 +28,9 @@ import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * TODO: change return null to throw new Exception
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -61,6 +64,12 @@ public class ApplicationUserService implements UserDetailsService {
         return userRepository.save(user);
     }
 
+    public ApplicationUserEntity registerUser(ApplicationUserEntity user, String initialRole) {
+        user.setRole(initialRole);
+        return registerUser(user);
+    }
+
+
     public ApplicationUserEntity getUser(Long id) {
         log.info("fetching user from the db.");
         var user = userRepository.findById(id);
@@ -78,6 +87,14 @@ public class ApplicationUserService implements UserDetailsService {
         return userRepository.findAll();
     }
 
+    /**
+     * edit the logged user => username and password
+     * @param request
+     * @param response
+     * @param updatedUser
+     * @return
+     * @throws Exception
+     */
     public ApplicationUserEntity updateUser(HttpServletRequest request, HttpServletResponse response, ApplicationUserEntity updatedUser) throws Exception {
         var requestUser = ApplicationJWT.getUserFromJWT(request);
         if(requestUser == null) throw new AuthorizationServiceException("No valid JWT!");
@@ -85,8 +102,13 @@ public class ApplicationUserService implements UserDetailsService {
         var dbUser = userRepository.findByUsername(requestUser.getUsername());
         if(dbUser == null) throw new AuthorizationServiceException("User not found in DB!");
 
+        /*
         if(updatedUser.getId() != dbUser.getId())
             throw new AuthorizationServiceException("User is not allowed to change the data of this user");
+
+         */
+        updatedUser.setId(requestUser.getId());
+        updatedUser.setRole(requestUser.getRole());
 
         if(!dbUser.getUsername().equals(updatedUser.getUsername())) {
             var isUsernameExisting = userRepository.findByUsername(updatedUser.getUsername());
@@ -107,6 +129,18 @@ public class ApplicationUserService implements UserDetailsService {
         return savedUpdatedUser;
     }
 
+    /**
+     * edit the username, password and role of a sendet user (id)
+     * admins can modify students
+     * admins can't modify other admin, only them self
+     *
+     * @param request
+     * @param response
+     * @param id
+     * @param updatedUser
+     * @return ApplicationUserEntity
+     * @throws Exception
+     */
     public ApplicationUserEntity updateUserByAdmin(HttpServletRequest request, HttpServletResponse response, String id, ApplicationUserEntity updatedUser) throws Exception {
         Long dbUserId = PathVariableParser.parseLong(id);
         var dbUser = userRepository.findById(dbUserId);

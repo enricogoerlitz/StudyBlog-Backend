@@ -7,19 +7,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 
-/** TODO: AuthController -> add the following routes
- *  /auth/isauth (with JWT (validate this) or Cookie (JWT => Validate this))
- *
+
+/**
+ *     Logout in Client => delete cookie!
+ *     update user => refresh cookie in client! => HTTP.POST(/login) -> fetch new Auth JWT
  */
-@Slf4j
 @RestController
 @RequestMapping(Routes.API + Routes.V1 + Routes.AUTH)
+@Slf4j
 public class AuthController {
 
     @GetMapping(Routes.HELLO_WORLD)
@@ -31,11 +31,4 @@ public class AuthController {
     public ResponseEntity<JWTVerificationResponse> getJWTCookie(HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.OK).body(ApplicationJWT.getTokenFromRequest(request));
     }
-/*
-    @PostMapping("/logout")
-    public ResponseEntity<Void> logout(HttpServletRequest request) {
-        //request.getCookies().
-    }
-
- */
 }

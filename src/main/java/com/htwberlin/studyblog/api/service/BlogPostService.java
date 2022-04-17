@@ -19,6 +19,9 @@ import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * TODO: change return null to throw new Exception
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -32,15 +35,18 @@ public class BlogPostService {
         return blogPostrepository.findAll();
     }
 
-    public BlogPostEntity addBlogpost(BlogPostModel blogPost) throws Exception {
-        var user = userRepository.findById(blogPost.getCreatorId());
-        if(user.isEmpty())
+    public BlogPostEntity addBlogpost(HttpServletRequest request, BlogPostModel blogPost) throws Exception {
+        var requestUser = ApplicationJWT.getUserFromJWT(request);
+        if(requestUser == null) return null;
+        var dbUser = userRepository.findByUsername(requestUser.getUsername());
+        if(dbUser == null)
             throw new Exception("Could not find the creator of the blogpost");
 
+        blogPost.setCreatorId(dbUser.getId());
         blogPost.setCreationDate(new Date());
         blogPost.setLastEditDate(new Date());
 
-        var blogPostEntity = Transformer.blogPostModelToEntity(blogPost, user.get());
+        var blogPostEntity = Transformer.blogPostModelToEntity(blogPost, dbUser);
         var savedBlogPost = blogPostrepository.save(blogPostEntity);
 
         log.info("blogpost added");

@@ -13,4 +13,8 @@ public final class Routes {
     public static final String HELLO_WORLD = "/helloworld";
     public static final String BLOGPOSTS = "/v1/blogposts";
     public static final String ADMIN_BLOGPOSTS = "/v1/admin/blogposts";
+    public static final String FAVORITES = "/v1/favorites";
+    public static final String FAVORITES_ID = "/v1/favorites/{id}";
+    public static final String USERS_EDIT = "/v1/users/edit";
+    public static final String USERS_ADMIN_ID = "/v1/admin/users/{id}";
 }

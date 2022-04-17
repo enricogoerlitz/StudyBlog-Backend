@@ -6,9 +6,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 public class JWTVerificationResponse {
-    private boolean isValid;
+    private final boolean isValid;
     private UsernamePasswordAuthenticationToken authenticationToken;
-    private ApplicationUserModel user;
     private String errorMessage = "";
 
     public JWTVerificationResponse(boolean isValid, String errorMessage) {
@@ -19,7 +18,6 @@ public class JWTVerificationResponse {
     public JWTVerificationResponse(boolean isValid, UsernamePasswordAuthenticationToken authenticationToken) {
         this.isValid = isValid;
         this.authenticationToken = authenticationToken;
-        this.user = this.getUser();
     }
 
     public boolean isValid() {

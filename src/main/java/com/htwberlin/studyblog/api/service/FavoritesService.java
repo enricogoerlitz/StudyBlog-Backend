@@ -21,6 +21,9 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * TODO: change return null to throw new Exception
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional
