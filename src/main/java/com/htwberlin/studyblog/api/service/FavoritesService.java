@@ -1,6 +1,8 @@
 package com.htwberlin.studyblog.api.service;
 
 import com.htwberlin.studyblog.api.authentication.ApplicationJWT;
+import com.htwberlin.studyblog.api.helper.Transformer;
+import com.htwberlin.studyblog.api.models.BlogPostModel;
 import com.htwberlin.studyblog.api.models.FavoritesModel;
 import com.htwberlin.studyblog.api.modelsEntity.ApplicationUserEntity;
 import com.htwberlin.studyblog.api.modelsEntity.BlogPostEntity;
@@ -18,8 +20,9 @@ import org.springframework.stereotype.Service;
 import javax.naming.AuthenticationException;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * TODO: change return null to throw new Exception
@@ -33,25 +36,39 @@ public class FavoritesService {
     private final ApplicationUserRepository userRepository;
     private final BlogPostRepository blogPostRepository;
 
+    public Set<Long> getFavoritesByCreator(HttpServletRequest request) throws AuthenticationException {
+        // TODO: source out
+        var validUser = ApplicationJWT.getUserFromJWT(request);
+        if(validUser == null)
+            throw new AuthenticationException("User has no valid JWT");
+
+        var dbFavorites = favouritesRepository.findAllByCreator_Username(validUser.getUsername());
+        return dbFavorites.stream().map(fav -> fav.getBlogPost().getId()).collect(Collectors.toSet());
+    }
+/*
     public List<FavoritesModel> getFavoritesByCreator(HttpServletRequest request) throws AuthenticationException {
         // TODO: source out
         var validUser = ApplicationJWT.getUserFromJWT(request);
-        if(validUser == null) throw new AuthenticationException("User has no valid JWT");
+        if(validUser == null)
+            throw new AuthenticationException("User has no valid JWT");
 
         var dbFavorites = favouritesRepository.findAllByCreator_Username(validUser.getUsername());
-        if(dbFavorites == null || dbFavorites.size() <= 0) return new ArrayList<>();
+        return Transformer.favoritesEntitiesToModels(dbFavorites);
+    }
+    */
 
-        return dbFavorites.stream().map(fav -> new FavoritesModel(fav.getId(), fav.getCreator().getId(), fav.getBlogPost().getId())).toList();
+    public List<FavoritesModel> getFavoritesByCreatorId(Long id) {
+        return Transformer.favoritesEntitiesToModels(favouritesRepository.findAllByCreator_Id(id));
     }
 
     public FavoritesModel addFavourite(ApplicationUserEntity creator, BlogPostEntity blogPost) {
         if(creator == null || blogPost == null) return null;
-        var entity = new FavoritesEntity(null, creator, blogPost);
+        var favoriteEntity = new FavoritesEntity(null, creator, blogPost);
 
-        var addedEntity = favouritesRepository.save(entity);
+        var addedFavoriteEntity = favouritesRepository.save(favoriteEntity);
 
         // TODO to Transformer-Class
-        return new FavoritesModel(addedEntity.getId(), addedEntity.getCreator().getId(), addedEntity.getBlogPost().getId());
+        return Transformer.favoritesEntityToModel(addedFavoriteEntity);
     }
 
     // TODO: source out AuthenticationException to utilities
@@ -69,12 +86,12 @@ public class FavoritesService {
         if(blogPost.isEmpty()) return null;
 
 // TODO: findByCreatorIdAnd
-        var isStillExisting = favouritesRepository.findByBlogPost_IdAndCreator_Id(blogPost.get().getId(), dbUser.getId());
-        if(isStillExisting != null) throw new DuplicateKeyException("This blog is already a favorite!");
-        var addedEntity = favouritesRepository.save(new FavoritesEntity(null, dbUser, blogPost.get()));
+        var existingFavoriteEntity = favouritesRepository.findByBlogPost_IdAndCreator_Id(blogPost.get().getId(), dbUser.getId());
+        if(existingFavoriteEntity != null) throw new DuplicateKeyException("This blog is already a favorite!");
+        var addedFavoriteEntity = favouritesRepository.save(new FavoritesEntity(null, dbUser, blogPost.get()));
 
         // TODO to Transformer-Class
-        return new FavoritesModel(addedEntity.getId(), addedEntity.getCreator().getId(), addedEntity.getBlogPost().getId());
+        return Transformer.favoritesEntityToModel(addedFavoriteEntity);
     }
 
     public void removeFavorite(HttpServletRequest request, String favoriteId) throws Exception {

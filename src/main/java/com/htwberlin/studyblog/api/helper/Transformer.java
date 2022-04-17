@@ -2,14 +2,21 @@ package com.htwberlin.studyblog.api.helper;
 
 import com.htwberlin.studyblog.api.models.ApplicationUserModel;
 import com.htwberlin.studyblog.api.models.BlogPostModel;
+import com.htwberlin.studyblog.api.models.FavoritesModel;
 import com.htwberlin.studyblog.api.modelsEntity.ApplicationUserEntity;
 import com.htwberlin.studyblog.api.modelsEntity.BlogPostEntity;
+import com.htwberlin.studyblog.api.modelsEntity.FavoritesEntity;
+import com.htwberlin.studyblog.api.utilities.Validator;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public final class Transformer {
 
     public static ApplicationUserModel userEntityToModel(ApplicationUserEntity entityUser) {
-        if(entityUser == null)
-            throw new IllegalArgumentException("Entity User was null!");
+        Validator.validateNotNullObject(entityUser);
 
         return new ApplicationUserModel(
             entityUser.getId(),
@@ -17,85 +24,46 @@ public final class Transformer {
             entityUser.getRole()
         );
     }
-    /*
-    public static ApplicationUserModel userEntityToModel(Optional<ApplicationUserEntity> userEntity) {
-        if(userEntity.isEmpty()) return null;
-        return userEntityToModel(userEntity.get());
+
+    public static List<ApplicationUserModel> userEntitiesToModels(List<ApplicationUserEntity> entityUsers) {
+        if(entityUsers == null || entityUsers.size() == 0) return new ArrayList<>();
+        return entityUsers.stream().map(Transformer::userEntityToModel).toList();
     }
 
+    public static BlogPostModel blogPostEntityToModel(BlogPostEntity blogPostEntity, boolean isUserFavorite) {
+        Validator.validateNotNullObject(blogPostEntity);
 
-     */
-    /*
-    public static ApplicationUserModel userEntityToModel(ApplicationUserEntity userEntity) {
-        if(userEntity == null) return null;
-        return new ApplicationUserModel(
-            userEntity.getId(),
-            userEntity.getUsername(),
-            userEntity.getPassword(),
-            userEntity.getRole()
-        );
-    }
-
-     */
-/*
-    public static ApplicationUserEntity userModelToEntity(ApplicationUserModel userModel) {
-        if(userModel == null) return null;
-        return new ApplicationUserEntity(
-            userModel.getId(),
-            userModel.getUsername(),
-            userModel.getPassword(),
-            userModel.getRole()
-        );
-    }
-    /*
-
-    public static List<BlogPostEntity> blockPostModelToEntityList(List<BlogPostModel> blogPosts) {
-        if(blogPosts == null) return null;
-
-        return blogPosts.stream().map(blogpost -> new BlogPostEntity(
-                blogpost.getId(),
-                blogpost.getTitle(),
-                blogpost.getContent(),
-                blogpost.getCreationDate(),
-                blogpost.getLastEditDate(),
-                Transformer.userModelToEntity(blogpost.getCreator())
-        )).toList();
-    }
-
-    public static List<BlogPostModel> blogPostEntityToModelList(List<BlogPostEntity> blogPosts) {
-        if(blogPosts == null) return null;
-        return blogPosts.stream().map(blogpost -> new BlogPostModel(
-                blogpost.getId(),
-                blogpost.getTitle(),
-                blogpost.getContent(),
-                blogpost.getCreationDate(),
-                blogpost.getLastEditDate(),
-                Transformer.userEntityToModel(blogpost.getCreator())
-        )).toList();
-    }
-
-    public static BlogPostEntity blogPostModelToEntity(BlogPostModel blogPost) {
-        return new BlogPostEntity(
-            blogPost.getId(),
-            blogPost.getTitle(),
-            blogPost.getContent(),
-            blogPost.getCreationDate(),
-            blogPost.getLastEditDate(),
-            Transformer.userModelToEntity(blogPost.getCreator())
-        );
-    }
-
-    public static BlogPostModel blogPostEntityToModel(BlogPostEntity blogPost) {
         return new BlogPostModel(
-                blogPost.getId(),
-                blogPost.getTitle(),
-                blogPost.getContent(),
-                blogPost.getCreationDate(),
-                blogPost.getLastEditDate(),
-                Transformer.userEntityToModel(blogPost.getCreator())
+                blogPostEntity.getId(),
+                blogPostEntity.getTitle(),
+                blogPostEntity.getContent(),
+                blogPostEntity.getCreationDate(),
+                blogPostEntity.getLastEditDate(),
+                blogPostEntity.getCreator().getId(),
+                isUserFavorite
         );
     }
-     */
+
+    public static List<BlogPostModel> blogPostEntitiesToModels(List<BlogPostEntity> blogPostEntities, List<FavoritesEntity> favoritesEntities) {
+        Validator.validateNotNullObject(blogPostEntities);
+        Set<Long> isFavoriteSet = favoritesEntities.stream().map(fav -> fav.getBlogPost().getId()).collect(Collectors.toSet());
+        return blogPostEntities.stream().map(blogPost -> blogPostEntityToModel(blogPost, isFavoriteSet.contains(blogPost.getId()))).toList();
+    }
+
+    public static FavoritesModel favoritesEntityToModel(FavoritesEntity favoritesEntity) {
+        Validator.validateNotNullObject(favoritesEntity);
+
+        return new FavoritesModel(
+            favoritesEntity.getId(),
+            Transformer.userEntityToModel(favoritesEntity.getCreator()),
+            favoritesEntity.getBlogPost().getId()
+        );
+    }
+
+    public static List<FavoritesModel> favoritesEntitiesToModels(List<FavoritesEntity> favoritesEntities) {
+        if(favoritesEntities == null || favoritesEntities.size() == 0) return new ArrayList<>();
+        return favoritesEntities.stream().map(Transformer::favoritesEntityToModel).toList();
+    }
 
     public static BlogPostEntity blogPostModelToEntity(BlogPostModel blogPostRequest, ApplicationUserEntity user) {
         return new BlogPostEntity(
@@ -108,5 +76,4 @@ public final class Transformer {
                 null
         );
     }
-
 }

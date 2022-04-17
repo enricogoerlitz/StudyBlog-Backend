@@ -1,7 +1,6 @@
 package com.htwberlin.studyblog.api.controller;
 
 import com.htwberlin.studyblog.api.models.BlogPostModel;
-import com.htwberlin.studyblog.api.modelsEntity.BlogPostEntity;
 import com.htwberlin.studyblog.api.service.BlogPostService;
 import com.htwberlin.studyblog.api.utilities.ResponseEntityExceptionManager;
 import com.htwberlin.studyblog.api.utilities.Routes;
@@ -26,16 +25,16 @@ public class BlogPostController {
     private final BlogPostService blogPostService;
 
     @GetMapping(Routes.BLOGPOSTS)
-    public ResponseEntity<List<BlogPostEntity>> getBlogposts(HttpServletResponse response) {
+    public ResponseEntity<List<BlogPostModel>> getBlogposts(HttpServletRequest request, HttpServletResponse response) {
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(blogPostService.getBlogPosts());
+            return ResponseEntity.status(HttpStatus.OK).body(blogPostService.getBlogPosts(request));
         } catch(Exception exp) {
             return ResponseEntityExceptionManager.handleException(response, EXCEPTION, exp);
         }
     }
 
     @PostMapping(Routes.BLOGPOSTS)
-    public ResponseEntity<BlogPostEntity> addBlogPost(HttpServletRequest request, HttpServletResponse response, @RequestBody BlogPostModel blogPost) {
+    public ResponseEntity<BlogPostModel> addBlogPost(HttpServletRequest request, HttpServletResponse response, @RequestBody BlogPostModel blogPost) {
         try {
             var addedBlogPost = blogPostService.addBlogpost(request, blogPost);
             return ResponseEntity.status(HttpStatus.CREATED).body(addedBlogPost);
@@ -45,7 +44,7 @@ public class BlogPostController {
     }
 
     @PutMapping(Routes.BLOGPOSTS)
-    public ResponseEntity<BlogPostEntity> updateBlogPost(HttpServletRequest request, HttpServletResponse response, @RequestBody BlogPostModel blogPost) {
+    public ResponseEntity<BlogPostModel> updateBlogPost(HttpServletRequest request, HttpServletResponse response, @RequestBody BlogPostModel blogPost) {
         try {
             var updatedBlogPost = blogPostService.updateBlogPost(request, blogPost);
             return ResponseEntity.status(HttpStatus.OK).body(updatedBlogPost);
@@ -57,7 +56,7 @@ public class BlogPostController {
     }
 
     @PutMapping(Routes.ADMIN_BLOGPOSTS)
-    public ResponseEntity<BlogPostEntity> updateBlogPostByAdmin(HttpServletResponse response, @RequestBody BlogPostModel blogPost) {
+    public ResponseEntity<BlogPostModel> updateBlogPostByAdmin(HttpServletResponse response, @RequestBody BlogPostModel blogPost) {
         try {
             var updatedBlogPost = blogPostService.updateBlogPostByAdmin(blogPost);
             return ResponseEntity.status(HttpStatus.OK).body(updatedBlogPost);

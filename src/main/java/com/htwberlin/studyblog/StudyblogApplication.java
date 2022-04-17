@@ -1,6 +1,7 @@
 package com.htwberlin.studyblog;
 
 import com.htwberlin.studyblog.api.authentication.Role;
+import com.htwberlin.studyblog.api.models.BlogPostModel;
 import com.htwberlin.studyblog.api.modelsEntity.ApplicationUserEntity;
 import com.htwberlin.studyblog.api.modelsEntity.BlogPostEntity;
 import com.htwberlin.studyblog.api.modelsEntity.FavoritesEntity;
@@ -36,7 +37,7 @@ public class StudyblogApplication {
 			getInitUsers().stream().forEach(user -> {
 				userService.registerUser(user);
 				getInitUserBlogPosts(user, 4).stream().forEach(post -> {
-					var addedPost = blogPostService.addBlogpost(post);
+					var addedPost = blogPostService.addBlogpostDEV(post);
 					getInitFavourites(user, addedPost).forEach(fav -> {
 						var f = favouriteService.addFavourite(user, addedPost);
 						log.warn("is favourite added: " + Boolean.toString(f != null));
@@ -78,8 +79,6 @@ public class StudyblogApplication {
 
 	private List<FavoritesEntity> getInitFavourites(ApplicationUserEntity user, BlogPostEntity blogPost) {
 		var fav1 = new FavoritesEntity(null, user, blogPost);
-		var initFavouriteslList = Arrays.asList(fav1);
-
-		return initFavouriteslList;
+		return Arrays.asList(fav1);
 	}
 }

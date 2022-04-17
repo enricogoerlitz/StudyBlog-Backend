@@ -16,7 +16,6 @@ import org.springframework.security.core.userdetails.User;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -112,14 +111,14 @@ public final class ApplicationJWT {
         return getUserFromRequestHeader(request);
     }
 
-    public static void refreshJWTCookie(HttpServletRequest request, HttpServletResponse response, Authentication authResult) throws IOException {
+    public static void refreshJWTCookie(HttpServletRequest request, HttpServletResponse response, Authentication authResult) {
         String jwtToken = createToken(request, authResult);
         addJWTCookie(request, response, jwtToken);
         HttpResponseWriter.writeJsonResponse(response, Map.of(ApplicationJWT.JWT_KEY_STUDYBLOG, jwtToken));
         log.info("JWT-Token initialized.");
     }
 
-    public static void refreshJWTCookie(HttpServletRequest request, HttpServletResponse response, ApplicationUserEntity user) throws IOException {
+    public static void refreshJWTCookie(HttpServletRequest request, HttpServletResponse response, ApplicationUserEntity user) {
         String jwtToken = createRefreshedToken(request, user);
         addJWTCookie(request, response, jwtToken);
         HttpResponseWriter.writeJsonResponse(response, Map.of(ApplicationJWT.JWT_KEY_STUDYBLOG, jwtToken));

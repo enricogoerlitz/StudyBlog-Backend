@@ -3,6 +3,7 @@ package com.htwberlin.studyblog.api.security;
 import com.htwberlin.studyblog.api.authentication.Role;
 import com.htwberlin.studyblog.api.security.httpFilter.CustomAuthenticationFilter;
 import com.htwberlin.studyblog.api.security.httpFilter.CustomAuthorizationFilter;
+import com.htwberlin.studyblog.api.utilities.Routes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,23 +36,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-        http.authorizeRequests().antMatchers(POST, "/api/v1/login/**").permitAll();
-        http.authorizeRequests().antMatchers(POST, "/api/v1/users/**").permitAll();
-        http.authorizeRequests().antMatchers(GET, "/api/v1/auth/**").permitAll();
-        http.authorizeRequests().antMatchers(POST, "/api/v1/auth/**").permitAll();
-        http.authorizeRequests().antMatchers(PUT, "/api/v1/users/**").hasAnyAuthority(Role.ADMIN.name(), Role.STUDENT.name());
-        http.authorizeRequests().antMatchers(GET, "/api/v1/users/**").hasAnyAuthority(Role.ADMIN.name());
-        http.authorizeRequests().antMatchers(GET, "/api/v1/admin/**").hasAnyAuthority(Role.ADMIN.name());
+        http.authorizeRequests().antMatchers(POST, Routes.API + Routes.LOGIN + "/**").permitAll();
+        http.authorizeRequests().antMatchers(GET, Routes.API + Routes.LOGIN + "/**").permitAll();
+        http.authorizeRequests().antMatchers(POST, Routes.API + Routes.LOGIN + "/**").permitAll();
+        http.authorizeRequests().antMatchers(POST, Routes.API + Routes.USERS + "/**").permitAll();
+        http.authorizeRequests().antMatchers(PUT, Routes.API + Routes.USERS + "/**").hasAnyAuthority(Role.ADMIN.name(), Role.STUDENT.name());
+        http.authorizeRequests().antMatchers(GET, Routes.API + Routes.USERS + "/**").hasAnyAuthority(Role.ADMIN.name());
+        http.authorizeRequests().antMatchers(GET, Routes.API + Routes.ADMIN + "/**").hasAnyAuthority(Role.ADMIN.name());
         http.authorizeRequests().anyRequest().authenticated();
 
-        // TODO: outsource
         var customAuthFilter = new CustomAuthenticationFilter(authenticationManagerBean());
-        customAuthFilter.setFilterProcessesUrl("/api/v1/login");
+        customAuthFilter.setFilterProcessesUrl(Routes.API + Routes.LOGIN);
         http.addFilter(customAuthFilter);
         http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 
-    // TODO: Delete?
     @Bean
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {

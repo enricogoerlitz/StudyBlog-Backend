@@ -31,11 +31,16 @@ public class BlogPostService {
     private final ApplicationUserRepository userRepository;
     private final FavoriteRepository favoriteRepository;
 
-    public List<BlogPostEntity> getBlogPosts() {
-        return blogPostrepository.findAll();
+    public List<BlogPostModel> getBlogPosts(HttpServletRequest request) {
+        var requestUser = ApplicationJWT.getUserFromJWT(request);
+        if(requestUser == null) return null;
+        var userFavorites = favoriteRepository.findAllByCreator_Username(requestUser.getUsername());
+        if(userFavorites == null) return null;
+
+        return Transformer.blogPostEntitiesToModels(blogPostrepository.findAll(), userFavorites);
     }
 
-    public BlogPostEntity addBlogpost(HttpServletRequest request, BlogPostModel blogPost) throws Exception {
+    public BlogPostModel addBlogpost(HttpServletRequest request, BlogPostModel blogPost) throws Exception {
         var requestUser = ApplicationJWT.getUserFromJWT(request);
         if(requestUser == null) return null;
         var dbUser = userRepository.findByUsername(requestUser.getUsername());
@@ -50,14 +55,18 @@ public class BlogPostService {
         var savedBlogPost = blogPostrepository.save(blogPostEntity);
 
         log.info("blogpost added");
-        return savedBlogPost;
+        return Transformer.blogPostEntityToModel(savedBlogPost, false);
     }
 
-    public BlogPostEntity addBlogpost(BlogPostEntity blogPost) {
+    public BlogPostModel addBlogpost(BlogPostEntity blogPost) {
+        return Transformer.blogPostEntityToModel(blogPostrepository.save(blogPost), false);
+    }
+
+    public BlogPostEntity addBlogpostDEV(BlogPostEntity blogPost) {
         return blogPostrepository.save(blogPost);
     }
 
-    public BlogPostEntity updateBlogPost(HttpServletRequest request, BlogPostModel blogPost) throws Exception {
+    public BlogPostModel updateBlogPost(HttpServletRequest request, BlogPostModel blogPost) throws Exception {
         // TODO: source out
         var dbBlogPost = blogPostrepository.findById(blogPost.getId());
         if(dbBlogPost.isEmpty()) throw new Exception("BlogPost not found!");
@@ -82,7 +91,7 @@ public class BlogPostService {
         return saveUpdatedBlogPost(verifiedDbBlogPost);
     }
 
-    public BlogPostEntity updateBlogPostByAdmin(BlogPostModel blogPost) throws Exception {
+    public BlogPostModel updateBlogPostByAdmin(BlogPostModel blogPost) throws Exception {
         // TODO: outsource
         var dbBlogPost = blogPostrepository.findById(blogPost.getId());
         if(dbBlogPost.isEmpty()) throw new Exception("BlogPost not found!");
@@ -120,15 +129,15 @@ public class BlogPostService {
         blogPostrepository.deleteById(blogPostId);
     }
 
-    private BlogPostEntity saveUpdatedBlogPost(BlogPostModel blogPost, ApplicationUserEntity user) {
+    private BlogPostModel saveUpdatedBlogPost(BlogPostModel blogPost, ApplicationUserEntity user) {
         return saveUpdatedBlogPost(Transformer.blogPostModelToEntity(blogPost, user));
     }
 
-    private BlogPostEntity saveUpdatedBlogPost(BlogPostEntity blogPost) {
+    private BlogPostModel saveUpdatedBlogPost(BlogPostEntity blogPost) {
         blogPost.setLastEditDate(new Date());
         var updatedBlogpost = blogPostrepository.save(blogPost);
 
-        return updatedBlogpost;
+        return Transformer.blogPostEntityToModel(updatedBlogpost, false);
     }
 
     private void deleteAllFavoritesFKs(Long blogPostId) {

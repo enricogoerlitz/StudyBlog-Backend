@@ -9,9 +9,11 @@ import java.util.Map;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 public final class HttpResponseWriter {
-    public static void writeJsonResponse(HttpServletResponse response, Map<String, String> writingMap) throws IOException {
+    public static void writeJsonResponse(HttpServletResponse response, Map<String, String> writingMap) {
         response.setContentType(APPLICATION_JSON_VALUE);
-        new ObjectMapper().writeValue(response.getOutputStream(), writingMap);
+        try {
+            new ObjectMapper().writeValue(response.getOutputStream(), writingMap);
+        } catch (IOException e) {}
     }
 
     public static Map<String, String> error(Exception exp) {

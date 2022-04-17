@@ -9,9 +9,6 @@ import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
 
-/** TODO: implement BlogPostEntity with a Many-to-Many relationship to ApplicationUserEntity and FavouriteEntity
- *
- */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -41,17 +38,4 @@ public class BlogPostEntity {
     @OneToMany(cascade = CascadeType.MERGE)
     @JsonIgnore
     private List<FavoritesEntity> favourites;
-
-    /*
-    public BlogPostEntity(Long id, String title, String content, Date creationDate, Date lastEditDate, ApplicationUserEntity creator) {
-        this.id = id;
-        this.title = title;
-        this.content = content;
-        this.creationDate = creationDate;
-        this.lastEditDate = lastEditDate;
-        this.creator = creator;
-        this.favourites = new ArrayList<>();
-    }
-
-     */
 }

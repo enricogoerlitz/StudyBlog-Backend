@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.naming.AuthenticationException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
+import java.util.Set;
 
 import static com.htwberlin.studyblog.api.utilities.ResponseEntityException.*;
 
@@ -27,7 +27,7 @@ public class FavoritesController {
     private final FavoritesService favoritesService;
 
     @GetMapping(Routes.FAVORITES)
-    public ResponseEntity<List<FavoritesModel>> getFavoritesByUser(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<Set<Long>> getFavoritesByUser(HttpServletRequest request, HttpServletResponse response) {
         try {
             var favorites = favoritesService.getFavoritesByCreator(request);
             return ResponseEntity.status(HttpStatus.OK).body(favorites);

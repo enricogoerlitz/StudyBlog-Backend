@@ -24,9 +24,9 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
     private final List<String> excludesUrls = Arrays.asList(
         Routes.API + Routes.LOGIN,
         Routes.API + Routes.AUTH + Routes.HELLO_WORLD,
-        "/api/v1/users",
-        "/api/v1/auth/",
-        "/api/v1/auth/logout"
+        Routes.API + Routes.USERS,
+        Routes.API + Routes.AUTH,
+        Routes.API + Routes.AUTH + "/"
     );
 
     @Override
@@ -37,7 +37,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
             return;
         }
 
-        var tokenValidation = getTokenValidation(request); // ApplicationJWT.validateToken(ApplicationJWT.getTokenFromRequestHeader(request));
+        var tokenValidation = getTokenValidation(request);
         if(!tokenValidation.isValid()) {
             log.warn("jwt token is invalid! Error: {}", tokenValidation.getErrorMessage());
             response.setStatus(FORBIDDEN.value());
@@ -51,10 +51,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
     }
 
     private static JWTVerificationResponse getTokenValidation(HttpServletRequest request) {
-        String cookieToken = ApplicationJWT.getTokenFromRequestCookie(request);
-        if(cookieToken != null) return ApplicationJWT.validateToken(cookieToken);
-
-        return ApplicationJWT.validateToken(ApplicationJWT.getTokenFromRequestHeader(request));
+        return ApplicationJWT.getTokenFromRequest(request);
     }
 
     private boolean isUrlExcluded(String route) {

@@ -1,6 +1,8 @@
 package com.htwberlin.studyblog.api.utilities;
 
-// TODO: implement Validator for Exceptions
 public final class Validator {
-
+    public static void validateNotNullObject(Object obj) {
+        if(obj == null)
+            throw new IllegalArgumentException("Entity User was null!");
+    }
 }

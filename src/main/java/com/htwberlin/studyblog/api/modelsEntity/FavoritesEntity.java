@@ -6,9 +6,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-/** TODO: implement FavouriteEntity with a double FK witch is together a PK
- *
- */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

@@ -1,6 +1,7 @@
 package com.htwberlin.studyblog.api.controller;
 
 import com.htwberlin.studyblog.api.authentication.Role;
+import com.htwberlin.studyblog.api.models.ApplicationUserModel;
 import com.htwberlin.studyblog.api.modelsEntity.ApplicationUserEntity;
 import com.htwberlin.studyblog.api.service.ApplicationUserService;
 import com.htwberlin.studyblog.api.utilities.ResponseEntityExceptionManager;
@@ -29,7 +30,7 @@ public class UsersController {
     private final ApplicationUserService userService;
 
     @GetMapping(Routes.ADMIN_USERS)
-    public ResponseEntity<List<ApplicationUserEntity>> getUsers(HttpServletResponse response) {
+    public ResponseEntity<List<ApplicationUserModel>> getUsers(HttpServletResponse response) {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(userService.getUsers());
         } catch (Exception exp) {
@@ -38,7 +39,7 @@ public class UsersController {
     }
 
     @PostMapping(Routes.USERS)
-    public ResponseEntity<ApplicationUserEntity> registerUser(HttpServletResponse response, @RequestBody ApplicationUserEntity newUser) {
+    public ResponseEntity<ApplicationUserModel> registerUser(HttpServletResponse response, @RequestBody ApplicationUserEntity newUser) {
         try {
             var createdUser = userService.registerUser(newUser, Role.STUDENT.name());
             return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
@@ -48,7 +49,7 @@ public class UsersController {
     }
 
     @PostMapping(Routes.ADMIN_USERS)
-    public ResponseEntity<ApplicationUserEntity> registerUserByAdmin(HttpServletResponse response, @RequestBody ApplicationUserEntity newUser) {
+    public ResponseEntity<ApplicationUserModel> registerUserByAdmin(HttpServletResponse response, @RequestBody ApplicationUserEntity newUser) {
         try {
             var createdUser = userService.registerUser(newUser);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
@@ -58,7 +59,7 @@ public class UsersController {
     }
 
     @PutMapping(Routes.USERS_EDIT)
-    public ResponseEntity<ApplicationUserEntity> updateUser(HttpServletRequest request, HttpServletResponse response, @RequestBody ApplicationUserEntity updatedUser) {
+    public ResponseEntity<ApplicationUserModel> updateUser(HttpServletRequest request, HttpServletResponse response, @RequestBody ApplicationUserEntity updatedUser) {
         try {
             var freshUpdatedUser = userService.updateUser(request, response, updatedUser);
             return ResponseEntity.status(HttpStatus.OK).body(freshUpdatedUser);
@@ -72,7 +73,7 @@ public class UsersController {
     }
 
     @PutMapping(Routes.USERS_ADMIN_ID)
-    public ResponseEntity<ApplicationUserEntity> updateUserByAdmin(HttpServletRequest request, HttpServletResponse response, @RequestBody ApplicationUserEntity updatedUser, @PathVariable String id) {
+    public ResponseEntity<ApplicationUserModel> updateUserByAdmin(HttpServletRequest request, HttpServletResponse response, @RequestBody ApplicationUserEntity updatedUser, @PathVariable String id) {
         try {
             var freshUpdatedUser = userService.updateUserByAdmin(request, response, id, updatedUser);
             return ResponseEntity.status(HttpStatus.OK).body(freshUpdatedUser);
@@ -85,7 +86,7 @@ public class UsersController {
         }
     }
 
-    @DeleteMapping("/v1/admin/users/{id}")
+    @DeleteMapping(Routes.USERS_ADMIN_ID)
     public ResponseEntity<Void> deleteUserByAdmin(HttpServletRequest request, HttpServletResponse response, @PathVariable String id) {
         try {
             userService.deleteUser(request, id);
