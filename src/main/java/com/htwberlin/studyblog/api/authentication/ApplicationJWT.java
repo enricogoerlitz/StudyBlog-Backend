@@ -1,6 +1,5 @@
 package com.htwberlin.studyblog.api.authentication;
 
-import ch.qos.logback.classic.spi.IThrowableProxy;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.htwberlin.studyblog.api.models.ApplicationUserModel;
@@ -8,7 +7,6 @@ import com.htwberlin.studyblog.api.modelsEntity.ApplicationUserEntity;
 import com.htwberlin.studyblog.api.utilities.ENV;
 import com.htwberlin.studyblog.api.utilities.HttpResponseWriter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -22,7 +20,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.Arrays.stream;
@@ -48,9 +45,9 @@ public final class ApplicationJWT {
     }
 
     public static String createRefreshedToken(HttpServletRequest request, ApplicationUserEntity user) {
-        var currentToken = getTokenFromRequest(request);
-        if(!currentToken.isValid())  throw new AuthorizationServiceException("Current JWT is invalid!");
+        var currentToken = getTokenFromRequest(request).validate();
         var authority = currentToken.getAuthenticationToken();
+
         return JWT.create()
                 .withSubject(user.getUsername())
                 .withExpiresAt(new Date(System.currentTimeMillis() + expiredDuration))
@@ -60,7 +57,9 @@ public final class ApplicationJWT {
     }
 
     public static JWTVerificationResponse validateToken(String jwt) {
-        if (jwt == null || jwt.isEmpty()) return new JWTVerificationResponse(false, "The JWT was null");
+        if (jwt == null || jwt.isEmpty())
+            return new JWTVerificationResponse(false, "The JWT-Token was null!");
+
         try {
             var algorithm = Algorithm.HMAC256(ENV.getJWTSecret().getBytes());
             var jwtVerifier = JWT.require(algorithm).build();
@@ -78,27 +77,22 @@ public final class ApplicationJWT {
 
     public static String getTokenFromRequestHeader(HttpServletRequest request) {
         String authHeader = request.getHeader(AUTHORIZATION);
-        if (authHeader == null) return null;
-        log.info("validate by header");
 
-        return removeBearerPrefix(authHeader);
+        log.info("Validate JWT-Token by Authorization-Header.");
+        return authHeader == null ? null : removeBearerPrefix(authHeader);
     }
 
     public static String getTokenFromRequestCookie(HttpServletRequest request) {
-        var cookies = request.getCookies();
+        var jwtCookies = getJWTCookies(request);
+        if(jwtCookies == null || jwtCookies.size() == 0) return null;
 
-        if(cookies == null) return null;
-        List<Cookie> optionalJwt = stream(request.getCookies())
-            .filter(p -> p.getName().equals(ApplicationJWT.JWT_KEY_STUDYBLOG)).toList();
-
-        if(optionalJwt.size() == 0) return null;
-        log.warn("CookieJWT: " + optionalJwt.get(0).getValue());
-        return optionalJwt.get(0).getValue();
+        log.info("Validate JWT-Token by Request-Cookie.");
+        return jwtCookies.get(0).getValue();
     }
 
     public static JWTVerificationResponse getTokenFromRequest(HttpServletRequest request) {
-        var cookieValidatedToken = validateToken(getTokenFromRequestCookie(request));
-        if(cookieValidatedToken.isValid()) return cookieValidatedToken;
+        var validatedToken = validateToken(getTokenFromRequestCookie(request));
+        if(validatedToken.isValid()) return validatedToken;
 
         return validateToken(getTokenFromRequestHeader(request));
     }
@@ -119,25 +113,23 @@ public final class ApplicationJWT {
     }
 
     public static void refreshJWTCookie(HttpServletRequest request, HttpServletResponse response, Authentication authResult) throws IOException {
-        String jwtToken = ApplicationJWT.createToken(request, authResult);
+        String jwtToken = createToken(request, authResult);
         addJWTCookie(request, response, jwtToken);
-        //response.addCookie(new Cookie(ApplicationJWT.JWT_KEY_STUDYBLOG, jwtToken));
         HttpResponseWriter.writeJsonResponse(response, Map.of(ApplicationJWT.JWT_KEY_STUDYBLOG, jwtToken));
+        log.info("JWT-Token initialized.");
     }
 
     public static void refreshJWTCookie(HttpServletRequest request, HttpServletResponse response, ApplicationUserEntity user) throws IOException {
-        String jwtToken = ApplicationJWT.createRefreshedToken(request, user);
+        String jwtToken = createRefreshedToken(request, user);
         addJWTCookie(request, response, jwtToken);
-        //response.addCookie(new Cookie(ApplicationJWT.JWT_KEY_STUDYBLOG, jwtToken));
         HttpResponseWriter.writeJsonResponse(response, Map.of(ApplicationJWT.JWT_KEY_STUDYBLOG, jwtToken));
-        log.info("Token refreshed");
+        log.info("JWT-Token refreshed.");
     }
 
     private static void addJWTCookie(HttpServletRequest request, HttpServletResponse response, String jwtToken) {
         var cookies = request.getCookies();
         if(cookies == null) {
             response.addCookie(new Cookie(JWT_KEY_STUDYBLOG, jwtToken));
-            log.info("Token init added");
             return;
         }
 
@@ -149,46 +141,19 @@ public final class ApplicationJWT {
             }
         }
     }
-/*
-    public static void clearCookies(HttpServletRequest request, HttpServletResponse response) {
-        var cookies = request.getCookies();
-        if(cookies == null) return;
-        for(Cookie cookie : cookies) {
-            if(cookie.getName().equals(JWT_KEY_STUDYBLOG)) {
-                cookie.setValue(null);
-                cookie.setPath("/");
-                cookie.setMaxAge(0);
-                response.addCookie(new Cookie(cookie.getName(), null));
-                log.info("Token removed");
-            }
-        }
-    }
 
- */
-/*
-    public static void setJWTToCookie(HttpServletRequest request, HttpServletResponse response, Authentication authResult) {
-        String jwtToken = ApplicationJWT.createToken(request, authResult);
-        request.getCookies().
-        response.addCookie(new Cookie(ApplicationJWT.JWT_KEY_STUDYBLOG, jwtToken));
-    }
-
- */
-/*
-    private static Optional<Cookie> getCookie(HttpServletRequest request, String cookieKey) {
+    private static List<Cookie> getJWTCookies(HttpServletRequest request) {
         var cookies = request.getCookies();
 
-        if(cookies == null) return Optional.empty();
-        List<Cookie> optionalJwt = stream(request.getCookies())
-                .filter(p -> p.getName().equals(cookieKey)).toList();
+        if(cookies == null) return null;
+        List<Cookie> jwtCookies = stream(request.getCookies())
+                .filter(p -> p.getName().equals(ApplicationJWT.JWT_KEY_STUDYBLOG)).toList();
 
-        if(optionalJwt.size() != 1) return Optional.empty();
+        if(jwtCookies.size() == 0) return null;
 
-        log.info("validate by cookie");
-        return Optional.of(optionalJwt.get(0));
+        return jwtCookies;
     }
 
-
- */
     private static String removeBearerPrefix(String jwtWithPrefix) {
         return jwtWithPrefix.substring(ApplicationJWT.BEARER_PREFIX.length());
     }
