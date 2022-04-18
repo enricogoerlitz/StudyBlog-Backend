@@ -1,7 +1,7 @@
 package com.htwberlin.studyblog.api.service;
 
 import com.htwberlin.studyblog.api.helper.ServiceValidator;
-import com.htwberlin.studyblog.api.helper.Transformer;
+import com.htwberlin.studyblog.api.helper.EntityModelTransformer;
 import com.htwberlin.studyblog.api.models.FavoritesModel;
 import com.htwberlin.studyblog.api.modelsEntity.ApplicationUserEntity;
 import com.htwberlin.studyblog.api.modelsEntity.BlogPostEntity;
@@ -9,9 +9,8 @@ import com.htwberlin.studyblog.api.modelsEntity.FavoritesEntity;
 import com.htwberlin.studyblog.api.repository.ApplicationUserRepository;
 import com.htwberlin.studyblog.api.repository.BlogPostRepository;
 import com.htwberlin.studyblog.api.repository.FavoriteRepository;
-import com.htwberlin.studyblog.api.utilities.PathVariableParser;
+import com.htwberlin.studyblog.api.helper.PathVariableParser;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +27,7 @@ public class FavoritesService {
     private final BlogPostRepository blogPostRepository;
 
     public Set<Long> getFavoritesByCreator(HttpServletRequest request) throws Exception {
-        return ServiceValidator.getValidUserFavoriteBlogPostsByRequestAsSet(request, favouritesRepository);
+        return ServiceValidator.getValidUserFavoriteBlogPostIdsByRequestAsSet(request, favouritesRepository);
     }
 
     public FavoritesModel addFavoriteDEV(ApplicationUserEntity creator, BlogPostEntity blogPost) {
@@ -36,7 +35,7 @@ public class FavoritesService {
         var favoriteEntity = new FavoritesEntity(null, creator, blogPost);
         var addedFavoriteEntity = favouritesRepository.save(favoriteEntity);
 
-        return Transformer.favoritesEntityToModel(addedFavoriteEntity);
+        return EntityModelTransformer.favoritesEntityToModel(addedFavoriteEntity);
     }
 
     public FavoritesModel addFavorite(HttpServletRequest request, String blogPostId) throws Exception {
@@ -46,7 +45,7 @@ public class FavoritesService {
         checkIsFavoriteAlreadyInDb(blogPost.getId(), requestUser.getId());
         var addedFavoriteEntity = favouritesRepository.save(new FavoritesEntity(null, requestUser, blogPost));
 
-        return Transformer.favoritesEntityToModel(addedFavoriteEntity);
+        return EntityModelTransformer.favoritesEntityToModel(addedFavoriteEntity);
     }
 
     public void removeFavorite(HttpServletRequest request, String blogPostId) throws Exception {

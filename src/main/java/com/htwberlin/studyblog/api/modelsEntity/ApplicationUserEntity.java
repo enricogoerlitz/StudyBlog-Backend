@@ -10,6 +10,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 
+/** ApplicationUserEntity
+ *  EntityTable for ApplicationUsers.
+ */
 @Entity(name = "users")
 @Data
 @NoArgsConstructor

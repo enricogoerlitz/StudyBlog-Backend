@@ -6,6 +6,9 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+/** FavoritesEntity
+ *  EntityTable for UserBlogPostFavorites.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

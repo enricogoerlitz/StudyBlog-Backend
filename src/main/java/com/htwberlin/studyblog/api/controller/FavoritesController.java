@@ -19,6 +19,9 @@ import java.util.Set;
 
 import static com.htwberlin.studyblog.api.utilities.ResponseEntityException.*;
 
+/** FavoritesController
+ *  RESTController for Favorites-Routes
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(Routes.API)

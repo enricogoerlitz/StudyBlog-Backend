@@ -7,6 +7,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+/** ApplicationUserRepository
+ *  Repository for User-DB-Interactions.
+ */
 @Repository
 public interface ApplicationUserRepository extends JpaRepository<ApplicationUserEntity, Long> {
     Optional<ApplicationUserEntity> findById(Long id);

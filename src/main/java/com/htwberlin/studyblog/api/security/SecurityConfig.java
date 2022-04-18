@@ -19,6 +19,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import static org.springframework.http.HttpMethod.*;
 
+/** SecurityConfig
+ *  Class for Security configurations
+ */
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -36,6 +39,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
+        // define authorizations of explicit routes
         http.authorizeRequests().antMatchers(POST, Routes.API + Routes.LOGIN + "/**").permitAll();
         http.authorizeRequests().antMatchers(GET, Routes.API + Routes.LOGIN + "/**").permitAll();
         http.authorizeRequests().antMatchers(POST, Routes.API + Routes.LOGIN + "/**").permitAll();
@@ -48,6 +52,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().antMatchers(DELETE, Routes.API + Routes.ADMIN + "/**").hasAnyAuthority(Role.ADMIN.name());
         http.authorizeRequests().anyRequest().authenticated();
 
+        // set custom auth-filter
         var customAuthFilter = new CustomAuthenticationFilter(authenticationManagerBean());
         customAuthFilter.setFilterProcessesUrl(Routes.API + Routes.LOGIN);
         http.addFilter(customAuthFilter);

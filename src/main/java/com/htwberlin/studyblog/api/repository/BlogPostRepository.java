@@ -6,6 +6,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/** BlogPostRepository
+ *  Repository for BlogPost-DB-Interactions.
+ */
 @Repository
 public interface BlogPostRepository extends JpaRepository<BlogPostEntity, Long> {
     List<BlogPostEntity> findAll();

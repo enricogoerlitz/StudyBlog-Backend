@@ -6,6 +6,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/** FavoriteRepository
+ *  Repository for UserBlogPostFavorite-DB-Interactions.
+ */
 @Repository
 public interface FavoriteRepository extends JpaRepository<FavoritesEntity, Long> {
     List<FavoritesEntity> findAll();

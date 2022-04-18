@@ -2,7 +2,7 @@ package com.htwberlin.studyblog.api.security.httpFilter;
 
 import com.htwberlin.studyblog.api.authentication.ApplicationJWT;
 import com.htwberlin.studyblog.api.authentication.JWTVerificationResponse;
-import com.htwberlin.studyblog.api.utilities.HttpResponseWriter;
+import com.htwberlin.studyblog.api.helper.HttpResponseWriter;
 import com.htwberlin.studyblog.api.utilities.Routes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,8 +19,12 @@ import java.util.Map;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 
+/** CustomAuthorizationFilter
+ *  FilterClass for UserRole-Authorization
+ */
 @Slf4j
 public class CustomAuthorizationFilter extends OncePerRequestFilter {
+    // urls that are excluded from this Authorization-Filter
     private final List<String> excludesUrls = Arrays.asList(
         Routes.API + Routes.LOGIN,
         Routes.API + Routes.AUTH + Routes.HELLO_WORLD,
@@ -49,10 +53,21 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    /**
+     * Returns a JWTVerificationResponse, which contains the validation-status of the current JWT-Token.
+     * @param request http.request
+     * @return JWTVerificationResponse
+     */
     private static JWTVerificationResponse getTokenValidation(HttpServletRequest request) {
-        return ApplicationJWT.getTokenFromRequest(request);
+        return ApplicationJWT.getTokenVerificationResponseFromRequest(request);
     }
 
+    /**
+     * Checks, whether the request-url should be excluded by this Authorization-Filter.
+     * Returns True, if the url should be excluded, and false, if not.
+     * @param route String url-route (request-route)
+     * @return boolean
+     */
     private boolean isUrlExcluded(String route) {
         for(String url : excludesUrls) {
             if(route.equals(url)) return true;

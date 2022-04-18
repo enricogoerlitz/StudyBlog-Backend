@@ -17,10 +17,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import static com.htwberlin.studyblog.api.utilities.ResponseEntityException.AUTHORIZATION_SERVICE_EXCEPTION;
 
-
-/**
- *     Logout in Client => delete cookie!
- *     update user => refresh cookie in client! => HTTP.POST(/login) -> fetch new Auth JWT
+// Logout in Client => delete cookie!
+// update user => refresh cookie in client! => HTTP.POST(/login) -> fetch new Auth JWT
+/** AuthController
+ *  RESTController for Authentication-Routes
  */
 @RestController
 @RequiredArgsConstructor

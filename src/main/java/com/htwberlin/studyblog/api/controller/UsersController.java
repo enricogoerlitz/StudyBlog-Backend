@@ -7,7 +7,6 @@ import com.htwberlin.studyblog.api.service.ApplicationUserService;
 import com.htwberlin.studyblog.api.utilities.ResponseEntityExceptionManager;
 import com.htwberlin.studyblog.api.utilities.Routes;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AuthorizationServiceException;
@@ -20,8 +19,9 @@ import java.util.List;
 
 import static com.htwberlin.studyblog.api.utilities.ResponseEntityException.*;
 
-/**
- *      update user => refresh cookie in client! => HTTP.POST(/login) -> fetch new Auth JWT
+//update user => refresh cookie in client! => HTTP.POST(/login) -> fetch new Auth JWT
+/** UsersController
+ *  RESTController for User-Routes
  */
 @RestController
 @RequestMapping(Routes.API)

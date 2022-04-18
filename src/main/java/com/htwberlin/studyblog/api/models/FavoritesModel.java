@@ -4,7 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
-
+/** FavoritesModel
+ *  Model for UserBlogPostFavorites.
+ */
 @Data
 @RequiredArgsConstructor
 @AllArgsConstructor

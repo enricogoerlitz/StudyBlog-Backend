@@ -6,6 +6,9 @@ import lombok.Data;
 import javax.validation.constraints.Size;
 import java.util.Date;
 
+/** BlogPostModel
+ *  Model for BlogPosts with title and content validation.
+ */
 @AllArgsConstructor
 @Data
 public class BlogPostModel {

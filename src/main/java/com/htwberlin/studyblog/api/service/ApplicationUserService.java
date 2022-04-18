@@ -3,13 +3,14 @@ package com.htwberlin.studyblog.api.service;
 import com.htwberlin.studyblog.api.authentication.ApplicationJWT;
 import com.htwberlin.studyblog.api.authentication.Role;
 import com.htwberlin.studyblog.api.helper.ServiceValidator;
-import com.htwberlin.studyblog.api.helper.Transformer;
+import com.htwberlin.studyblog.api.helper.EntityModelTransformer;
 import com.htwberlin.studyblog.api.models.ApplicationUserModel;
 import com.htwberlin.studyblog.api.modelsEntity.ApplicationUserEntity;
 import com.htwberlin.studyblog.api.repository.ApplicationUserRepository;
 import com.htwberlin.studyblog.api.repository.BlogPostRepository;
 import com.htwberlin.studyblog.api.repository.FavoriteRepository;
-import com.htwberlin.studyblog.api.utilities.PathVariableParser;
+import com.htwberlin.studyblog.api.helper.ObjectValidator;
+import com.htwberlin.studyblog.api.helper.PathVariableParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -37,12 +38,11 @@ public class ApplicationUserService implements UserDetailsService {
     private final FavoriteRepository favoriteRepository;
     private final PasswordEncoder passwordEncoder;
 
-    /** loadUserByUsername
+    /**
      * Overrides a method fpr user-authentication. By request to /api/v1/login
-     * the authentication-process gets triggered and trys to find a user in the DB by username
+     * the authentication-process gets triggered and trys to find a user in the DB by username.
      * If the method can find a user by his username in the DB, its return an auth-user
-     * otherwise it throws an error (UsernameNotFoundException)
-     *
+     * otherwise it throws an error (UsernameNotFoundException).
      * @param username username of the post-param 'username'
      * @return UserDetails
      * @throws UsernameNotFoundException if user could not be found by username, throw this exception
@@ -62,20 +62,18 @@ public class ApplicationUserService implements UserDetailsService {
         );
     }
 
-    /** getUsers
-     * fetches all users from the db
-     *
+    /**
+     * Fetches all users from the DB and transforms the entities to models.
      * @return List<ApplicationUserModel>
      */
     public List<ApplicationUserModel> getUsers() {
-        return Transformer.userEntitiesToModels(userRepository.findAll());
+        return EntityModelTransformer.userEntitiesToModels(userRepository.findAll());
     }
 
     /** registerUser
-     * Saves a new User to the DB. This method is for Users, who register themselves.
-     *
-     * @param user The userdata, which should be registered
-     * @param initialRole The role, what the user should get
+     * Saves a new User with an initial role to the DB. This method is for Users, who are registering themselves.
+     * @param user ApplicationUserEntity The userdata, which should be registered
+     * @param initialRole String The role, what the user should get
      * @return ApplicationUserModel
      */
     public ApplicationUserModel registerUser(ApplicationUserEntity user, String initialRole) throws Exception {
@@ -84,20 +82,21 @@ public class ApplicationUserService implements UserDetailsService {
     }
 
     /** registerUser
-     * Saves a new User to the DB. This method is for Admins, who register a new User.
-     *
+     * Saves a new User with an encrypted password to the DB. This method is for Admins, who register a new User.
      * @param user The userdata, which should be registered (by admin, incl. role)
      * @return ApplicationUserModel
      */
     public ApplicationUserModel registerUser(ApplicationUserEntity user) throws Exception {
         validateRole(user.getRole());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return Transformer.userEntityToModel(userRepository.save(user));
+        return EntityModelTransformer.userEntityToModel(userRepository.save(user));
     }
 
     /** updateUser
      * Updates the logged user (from JWT-Token)
      * It updates the username and password, if they have changed.
+     * MORE!
+     *
      *
      * @param request http.request
      * @param response http.response
@@ -113,7 +112,7 @@ public class ApplicationUserService implements UserDetailsService {
         changeUsername(manipulationDbUser, updatedUser);
         changePassword(manipulationDbUser, updatedUser);
 
-        var savedUpdatedUser = (ApplicationUserEntity)ServiceValidator.getValidObjOrThrowException(
+        var savedUpdatedUser = ObjectValidator.getValidObjOrThrowException(
             userRepository.save(manipulationDbUser),
             EXCEPTION,
             "User could not be updated!"
@@ -121,7 +120,7 @@ public class ApplicationUserService implements UserDetailsService {
 
         ApplicationJWT.refreshJWTCookie(request, response, savedUpdatedUser);
 
-        return Transformer.userEntityToModel(savedUpdatedUser);
+        return EntityModelTransformer.userEntityToModel(savedUpdatedUser);
     }
 
     /**
@@ -148,7 +147,7 @@ public class ApplicationUserService implements UserDetailsService {
         changePassword(manipulationDbUser, updatedUser);
         changeRole(manipulationDbUser, updatedUser);
 
-        return Transformer.userEntityToModel(userRepository.save(manipulationDbUser));
+        return EntityModelTransformer.userEntityToModel(userRepository.save(manipulationDbUser));
     }
 
     /**

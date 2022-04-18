@@ -1,6 +1,6 @@
 package com.htwberlin.studyblog.api.utilities;
 
-import lombok.extern.slf4j.Slf4j;
+import com.htwberlin.studyblog.api.helper.HttpResponseWriter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 

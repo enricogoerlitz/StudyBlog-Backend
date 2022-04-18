@@ -18,6 +18,9 @@ import java.util.List;
 
 import static com.htwberlin.studyblog.api.utilities.ResponseEntityException.*;
 
+/** BlogPostController
+ *  RESTController for BlogPost-Routes
+ */
 @RestController
 @RequestMapping(Routes.API)
 @RequiredArgsConstructor
