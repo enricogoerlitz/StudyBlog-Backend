@@ -5,7 +5,6 @@ import com.htwberlin.studyblog.api.service.FavoritesService;
 import com.htwberlin.studyblog.api.utilities.ResponseEntityExceptionManager;
 import com.htwberlin.studyblog.api.utilities.Routes;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -54,13 +53,6 @@ public class FavoritesController {
         }
     }
 
-    /**
-     *
-     * @param request
-     * @param response
-     * @param id blogPostId
-     * @return
-     */
     @DeleteMapping(Routes.FAVORITES_ID)
     public ResponseEntity<Void> deleteFavorite(HttpServletRequest request, HttpServletResponse response, @PathVariable String id) {
         try {

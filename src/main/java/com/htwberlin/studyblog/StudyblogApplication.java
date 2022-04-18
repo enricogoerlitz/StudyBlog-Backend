@@ -29,6 +29,13 @@ public class StudyblogApplication {
 		SpringApplication.run(StudyblogApplication.class, args);
 	}
 
+	/**
+	 * Method initialisation
+	 * @param userService _
+	 * @param blogPostService _
+	 * @param favouriteService _
+	 * @return _
+	 */
 	@Bean
 	CommandLineRunner run(ApplicationUserService userService, BlogPostService blogPostService, FavoritesService favouriteService) {
 		return args -> {
@@ -39,7 +46,7 @@ public class StudyblogApplication {
 					e.printStackTrace();
 				}
 				getInitUserBlogPosts(user, 4).forEach(post -> {
-					var addedPost = blogPostService.addBlogpostDEV(post);
+					var addedPost = blogPostService.addBlogPostDEV(post);
 					getInitFavourites(user, addedPost).forEach(fav -> favouriteService.addFavoriteDEV(user, addedPost));
 				});
 				log.info("User " + user.getUsername() + " (" + user.getRole() + ") added to DB.");
@@ -53,6 +60,10 @@ public class StudyblogApplication {
 		return new BCryptPasswordEncoder();
 	}
 
+	/**
+	 * Method for generating initialUsers
+	 * @return List<ApplicationUserEntity>
+	 */
 	private List<ApplicationUserEntity> getInitUsers() {
 		var admin = new ApplicationUserEntity(1l,"admin", ENV.getAdminPassword(), Role.ADMIN.name());
 		var root = new ApplicationUserEntity(2l,"root", ENV.getRootPassword(), Role.ADMIN.name());
@@ -61,6 +72,12 @@ public class StudyblogApplication {
 		return Arrays.asList(admin, root, testStudent);
 	}
 
+	/**
+	 * DEVELOPMENT
+	 * @param user _
+	 * @param postCounts _
+	 * @return _
+	 */
 	private List<BlogPostEntity> getInitUserBlogPosts(ApplicationUserEntity user, int postCounts) {
 		var posts = new ArrayList<BlogPostEntity>();
 		for(int i = 0; i < postCounts; i++) {
@@ -78,6 +95,12 @@ public class StudyblogApplication {
 		return posts;
 	}
 
+	/**
+	 * DEVELOPMENT
+	 * @param user _
+	 * @param blogPost _
+	 * @return _
+	 */
 	private List<FavoritesEntity> getInitFavourites(ApplicationUserEntity user, BlogPostEntity blogPost) {
 		var fav1 = new FavoritesEntity(null, user, blogPost);
 		return List.of(fav1);

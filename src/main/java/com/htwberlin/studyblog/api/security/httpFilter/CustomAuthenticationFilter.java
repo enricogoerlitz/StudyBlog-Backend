@@ -2,7 +2,6 @@ package com.htwberlin.studyblog.api.security.httpFilter;
 
 import com.htwberlin.studyblog.api.authentication.ApplicationJWT;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;

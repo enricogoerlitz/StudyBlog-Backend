@@ -1,5 +1,8 @@
 package com.htwberlin.studyblog.api.utilities;
 
+/** ResponseEntityException
+ *  enum fpr exceptionManagement
+ */
 public enum ResponseEntityException {
     EXCEPTION,
     AUTHORIZATION_SERVICE_EXCEPTION,

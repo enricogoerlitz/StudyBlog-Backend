@@ -2,7 +2,6 @@ package com.htwberlin.studyblog.api.authentication;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.htwberlin.studyblog.api.models.ApplicationUserModel;
 import com.htwberlin.studyblog.api.modelsEntity.ApplicationUserEntity;
 import com.htwberlin.studyblog.api.utilities.ENV;
 import com.htwberlin.studyblog.api.helper.HttpResponseWriter;
@@ -138,7 +137,7 @@ public final class ApplicationJWT {
      * @param request http.request
      * @return ApplicationUserModel CurrentValidUser or Null
      */
-    public static ApplicationUserModel getUserFromJWT(HttpServletRequest request) {
+    public static JWTUser getUserFromJWT(HttpServletRequest request) {
         var cookieUser = getUserFromRequestCookie(request);
         if(cookieUser != null)
             return cookieUser;
@@ -147,20 +146,20 @@ public final class ApplicationJWT {
     }
 
     /**
-     * Returns the CurrentValidUser (ApplicationUserModel) from the "studyblog_jwt"-Cookie.
+     * Returns the CurrentValidUser (JWTUser) from the "studyblog_jwt"-Cookie.
      * @param request http.request
-     * @return ApplicationUserModel CurrentValidUser or Null
+     * @return JWTUser CurrentValidUser or Null
      */
-    public static ApplicationUserModel getUserFromRequestCookie(HttpServletRequest request) {
+    public static JWTUser getUserFromRequestCookie(HttpServletRequest request) {
         return validateToken(getTokenFromRequestCookie(request)).getUser();
     }
 
     /**
-     * Returns the CurrentValidUser (ApplicationUserModel) from the Authorization-Header
+     * Returns the CurrentValidUser (JWTUser) from the Authorization-Header
      * @param request http.request
-     * @return ApplicationUserModel CurrentValidUser or Null
+     * @return JWTUser CurrentValidUser or Null
      */
-    public static ApplicationUserModel getUserFromRequestHeader(HttpServletRequest request) {
+    public static JWTUser getUserFromRequestHeader(HttpServletRequest request) {
         return validateToken(getTokenFromRequestHeader(request)).getUser();
     }
 

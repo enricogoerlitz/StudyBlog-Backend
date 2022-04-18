@@ -28,6 +28,9 @@ import java.util.List;
 
 import static com.htwberlin.studyblog.api.utilities.ResponseEntityException.EXCEPTION;
 
+/** ApplicationUserService
+ *  Service for ApplicationUser BusinessLogic
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -70,7 +73,7 @@ public class ApplicationUserService implements UserDetailsService {
         return EntityModelTransformer.userEntitiesToModels(userRepository.findAll());
     }
 
-    /** registerUser
+    /**
      * Saves a new User with an initial role to the DB. This method is for Users, who are registering themselves.
      * @param user ApplicationUserEntity The userdata, which should be registered
      * @param initialRole String The role, what the user should get
@@ -81,7 +84,8 @@ public class ApplicationUserService implements UserDetailsService {
         return registerUser(user);
     }
 
-    /** registerUser
+    /**
+     * This route is for admin-users only.
      * Saves a new User with an encrypted password to the DB. This method is for Admins, who register a new User.
      * @param user The userdata, which should be registered (by admin, incl. role)
      * @return ApplicationUserModel
@@ -92,12 +96,11 @@ public class ApplicationUserService implements UserDetailsService {
         return EntityModelTransformer.userEntityToModel(userRepository.save(user));
     }
 
-    /** updateUser
-     * Updates the logged user (from JWT-Token)
-     * It updates the username and password, if they have changed.
-     * MORE!
-     *
-     *
+    /**
+     * This Route manipulates the data of the request-user.
+     * Updates the logged user (from JWT-Token).
+     * It updates the username and password, if they had changed.
+     * Fetches the user from the db by the JWT-Request-Token.
      * @param request http.request
      * @param response http.response
      * @param updatedUser the userdata, which should updated to the DB.
@@ -124,10 +127,11 @@ public class ApplicationUserService implements UserDetailsService {
     }
 
     /**
-     * Description:
-     * Updating the username, password and role of a user (by userId)
+     * This route is for admin-users only.
+     * This route manipulates the data of the passed userId.
+     * Updating the username, password and role of a user (by userId).
      * admins can modify students and themselves
-     * admins can't modify other admin, only themselves
+     * admins can't modify other admins, only themselves
      * admins can modify themselves, but can't remove/change there role to a student, visitor oder any other role
      *
      * @param request http.request
@@ -151,12 +155,13 @@ public class ApplicationUserService implements UserDetailsService {
     }
 
     /**
-     * Admins can delete users, incl. themselves
-     * But Admins can't delete other admin-user
+     * This route is for admin-users only.
+     * Admins can delete users, incl. themselves.
+     * But admins can't delete other admin-user.
      * Deletes all references to this userId in the DB
      *
      * @param request http.request
-     * @param id id of the user, which should be deleted
+     * @param id String id of the user, which should be deleted
      * @throws Exception handling exception
      */
     public void deleteUser(HttpServletRequest request, String id) throws Exception {
@@ -171,6 +176,14 @@ public class ApplicationUserService implements UserDetailsService {
         userRepository.deleteById(userId);
     }
 
+    /**
+     * Changed the username of the manipulationDbUser to the username of updatedUser, if the usernames are different.
+     * If the usernames are different, validate, that the username of the updatedUser is not existing in the DB.
+     * If it is not existing, change the username.
+     * If it is existing, throw an IllegalArgumentException.
+     * @param manipulationDbUser ApplicationUserEntity manipulationDbUser
+     * @param updatedUser ApplicationUserEntity updatedUser
+     */
     private void changeUsername(ApplicationUserEntity manipulationDbUser, ApplicationUserEntity updatedUser) {
         if(manipulationDbUser.getUsername().equals(updatedUser.getUsername())) return;
 
@@ -181,31 +194,73 @@ public class ApplicationUserService implements UserDetailsService {
         manipulationDbUser.setUsername(updatedUser.getUsername());
     }
 
+    /**
+     * Changed the password of the manipulationDbUser to the password of the updatedUser.
+     * @param manipulationDbUser ApplicationUserEntity manipulationDbUser
+     * @param updatedUser ApplicationUserEntity updatedUser
+     */
     private void changePassword(ApplicationUserEntity manipulationDbUser, ApplicationUserEntity updatedUser) {
         manipulationDbUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
     }
 
+    /**
+     * Changed the role of the manipulationDbUser to the role of the updatedUser.
+     * Validates the role updatedUser and throws an exception, if the role is invalid.
+     * @param manipulationDbUser ApplicationUserEntity manipulationDbUser
+     * @param updatedUser ApplicationUserEntity updatedUser
+     * @throws Exception handling exception
+     */
     private void changeRole(ApplicationUserEntity manipulationDbUser, ApplicationUserEntity updatedUser) throws Exception {
         if(updatedUser.getRole() == null) return;
         validateRole(updatedUser.getRole());
         manipulationDbUser.setRole(updatedUser.getRole());
     }
 
-    private boolean isManipulationUserAdmin(ApplicationUserEntity user) {
-        return user.getRole().equals(Role.ADMIN.name());
+    /**
+     * Checks, whether the manipulationUser ha the admin-role.
+     * Returns True, if the user has the admin-role, else False
+     * @param manipulationUser ApplicationUserEntity manipulationUser
+     * @return boolean
+     */
+    private boolean isManipulationUserAdmin(ApplicationUserEntity manipulationUser) {
+        return manipulationUser.getRole().equals(Role.ADMIN.name());
     }
 
+    /**
+     * This method will be called, if the user, which want to be manipulated, has the admin-role.
+     * Checks, whether the request-user (manipulationDbUser) ist also the updatedUser and so authorized, to manipulate an admin-user.
+     * Checks, that the role has not changed. You can't change the role of an admin-user!
+     * If one of the checks failed, this method will throw an exception.
+     * @param request http.request
+     * @param manipulationDbUser ApplicationUserEntity manipulationDbUser
+     * @param updatedUser ApplicationUserEntity updatedUser
+     * @throws Exception handle exception
+     */
     private void checkRequestUserIsAuthorizedForAdminManipulation(HttpServletRequest request, ApplicationUserEntity manipulationDbUser, ApplicationUserEntity updatedUser) throws Exception {
         var requestUser = ServiceValidator.getValidDbUserFromRequest(request, userRepository);
         validateManipulationDbUserIsRequestUser(manipulationDbUser, requestUser);
         validateManipulationUserHasNotChangedRole(manipulationDbUser, updatedUser);
     }
 
+    /**
+     * Checks, whether the request-user (manipulationDbUser) ist also the updatedUser and so authorized, to manipulate an admin-user.
+     * If not, this method will throw an exception.
+     * @param request http.request
+     * @param delDbUser ApplicationUserEntity deleteUser
+     * @throws Exception handle exception
+     */
     private void checkRequestUserIsAuthorizedToDeleteAdminUser(HttpServletRequest request, ApplicationUserEntity delDbUser) throws Exception {
         var requestUser = ServiceValidator.getValidDbUserFromRequest(request, userRepository);
         validateManipulationDbUserIsRequestUser(delDbUser, requestUser);
     }
 
+    /**
+     * Compares manipulationDbUser and requestUser by their ids.
+     * If the ids are matching: nothing happens.
+     * If not: Tt throws an AuthorizationServiceException with a custom ErrorMessage.
+     * @param manipulationDbUser ApplicationUserEntity manipulationDbUser
+     * @param requestUser ApplicationUserEntity requestUser
+     */
     private void validateManipulationDbUserIsRequestUser(ApplicationUserEntity manipulationDbUser, ApplicationUserEntity requestUser) {
         ServiceValidator.validateEqualUserIds(
                 manipulationDbUser,
@@ -214,11 +269,23 @@ public class ApplicationUserService implements UserDetailsService {
         );
     }
 
+    /**
+     * This method will be called, if the user, which want to be manipulated, has the admin-role.
+     * Checks, that the role has not changed. You can't change the role of an admin-user!
+     * @param manipulationDbUser ApplicationUserEntity manipulationDbUser
+     * @param updatedUser ApplicationUserEntity updatedUser
+     * @throws Exception handle exception
+     */
     private void validateManipulationUserHasNotChangedRole(ApplicationUserEntity manipulationDbUser, ApplicationUserEntity updatedUser) throws Exception {
         if(!manipulationDbUser.getRole().equals(updatedUser.getRole()) && updatedUser.getRole() != null)
             throw new Exception("You can't change the role of a admin-user! Admin-Role can't be removed.");
     }
 
+    /**
+     * Validates a passed role, whether the role matches the ApplicationRoles.
+     * @param role String
+     * @throws Exception handle exception
+     */
     private void validateRole(String role) throws Exception {
         for(Role validRole : Role.values()) {
             if(role.equals(validRole.name())) return;

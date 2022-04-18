@@ -1,5 +1,8 @@
 package com.htwberlin.studyblog.api.utilities;
 
+/** Routes
+ *  Static Class for managing Routes-Urls
+ */
 public final class Routes {
     public static final String API = "/api";
     public static final String V1 = "/v1";

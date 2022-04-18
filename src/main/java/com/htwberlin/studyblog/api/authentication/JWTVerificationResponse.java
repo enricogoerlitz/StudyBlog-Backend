@@ -1,6 +1,5 @@
 package com.htwberlin.studyblog.api.authentication;
 
-import com.htwberlin.studyblog.api.models.ApplicationUserModel;
 import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -59,12 +58,11 @@ public class JWTVerificationResponse {
     }
 
     /**
-     * Returns the ApplicationUserModel, of the token is valid.
-     * @return ApplicationUserModel (WITHOUT THE ID) or Null.
+     * Returns the JWTUser, of the token is valid.
+     * @return JWTUser or Null.
      */
-    public ApplicationUserModel getUser() {
-        return new ApplicationUserModel(
-            null,
+    public JWTUser getUser() {
+        return new JWTUser(
             extractUsernameFromAuthToken(),
             extractRoleFromAuthToken()
         );

@@ -1,7 +1,7 @@
 package com.htwberlin.studyblog.api.helper;
 
 import com.htwberlin.studyblog.api.authentication.ApplicationJWT;
-import com.htwberlin.studyblog.api.models.ApplicationUserModel;
+import com.htwberlin.studyblog.api.authentication.JWTUser;
 import com.htwberlin.studyblog.api.modelsEntity.ApplicationUserEntity;
 import com.htwberlin.studyblog.api.modelsEntity.BlogPostEntity;
 import com.htwberlin.studyblog.api.modelsEntity.FavoritesEntity;
@@ -29,17 +29,17 @@ import static com.htwberlin.studyblog.api.utilities.ResponseEntityException.*;
 public final class ServiceValidator {
 
     /**
-     * Returns a valid ApplicationUserModel, based on the JWT-Token of the request
+     * Returns a valid JWTUser, based on the JWT-Token of the request
      * or throws an exception.
      * (1.) Tries to get the user from the Cookie, validates the Cookie-JWT, if is valid, returns the valid UserModel or
      * (2.) Tries to get the user from the Authorization-Header, validates the Cookie-JWT, if is valid,
      *      returns the valid UserModel or Null
      * if the result is null, this method throws an exception
      * @param request http.request
-     * @return ApplicationUserModel valid UserModel (WITHOUT ID)
+     * @return JWTUser valid JWTUser
      * @throws Exception handling exception
      */
-    public static ApplicationUserModel getValidRequestUser(HttpServletRequest request) throws Exception {
+    public static JWTUser getValidRequestUser(HttpServletRequest request) throws Exception {
         return ObjectValidator.getValidObjOrThrowException(
             ApplicationJWT.getUserFromJWT(request),
             AUTHORIZATION_SERVICE_EXCEPTION,

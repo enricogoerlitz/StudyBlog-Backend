@@ -25,7 +25,7 @@ public final class HttpResponseWriter {
     }
 
     /**
-     * Converts a Exception to a errormessage and returns that es Map-Object
+     * Converts an Exception to an errormessage and returns that es Map-Object
      * @param exp Exception
      * @return Map<String, String> as errormessage
      */

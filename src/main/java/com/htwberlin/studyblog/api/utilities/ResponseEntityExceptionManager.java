@@ -6,6 +6,9 @@ import org.springframework.http.ResponseEntity;
 
 import javax.servlet.http.HttpServletResponse;
 
+/** ResponseEntityExceptionManager
+ *  Static Class for handle ResponseEntityExceptions and sent correct statusCodes
+ */
 public final class ResponseEntityExceptionManager {
     public static <T> ResponseEntity<T> handleException(HttpServletResponse response, ResponseEntityException exceptionType, Exception exp) {
         HttpResponseWriter.writeJsonResponse(response, HttpResponseWriter.error(exp));
