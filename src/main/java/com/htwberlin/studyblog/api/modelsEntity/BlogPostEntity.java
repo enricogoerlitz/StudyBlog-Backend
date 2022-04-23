@@ -14,7 +14,7 @@ import java.util.List;
  */
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
+//@NoArgsConstructor
 @Entity(name = "posts")
 public class BlogPostEntity {
     @Id
@@ -41,4 +41,6 @@ public class BlogPostEntity {
     @OneToMany(cascade = CascadeType.MERGE)
     @JsonIgnore
     private List<FavoritesEntity> favourites;
+
+    public BlogPostEntity(){}
 }

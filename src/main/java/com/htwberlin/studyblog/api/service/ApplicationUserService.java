@@ -107,7 +107,7 @@ public class ApplicationUserService implements UserDetailsService {
      * @return ApplicationUserModel
      * @throws Exception handling exception
      */
-    public ApplicationUserModel updateUser(HttpServletRequest request, HttpServletResponse response, ApplicationUserEntity updatedUser) throws Exception {
+    public String updateUser(HttpServletRequest request, HttpServletResponse response, ApplicationUserEntity updatedUser) throws Exception {
         var manipulationDbUser = ServiceValidator.getValidDbUserFromRequest(request, userRepository);
         validateRole(manipulationDbUser.getRole());
         updatedUser.setId(manipulationDbUser.getId());
@@ -121,9 +121,9 @@ public class ApplicationUserService implements UserDetailsService {
             "User could not be updated!"
         );
 
-        ApplicationJWT.refreshJWTCookie(request, response, savedUpdatedUser);
+        //ApplicationJWT.refreshJWTCookie(request, response, savedUpdatedUser);
 
-        return EntityModelTransformer.userEntityToModel(savedUpdatedUser);
+        return ApplicationJWT.createUserModelToken(request, savedUpdatedUser);
     }
 
     /**

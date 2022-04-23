@@ -11,7 +11,7 @@ import javax.persistence.*;
  */
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
+//@NoArgsConstructor
 @Entity(name = "favorites")
 public class FavoritesEntity {
     @Id
@@ -26,4 +26,6 @@ public class FavoritesEntity {
     @ManyToOne
     @JoinColumn(name = "blog_post_id", referencedColumnName = "id")
     private BlogPostEntity blogPost;
+
+    public FavoritesEntity(){}
 }

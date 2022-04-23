@@ -8,10 +8,12 @@ import lombok.RequiredArgsConstructor;
  *  Model for UserBlogPostFavorites.
  */
 @Data
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 @AllArgsConstructor
 public class FavoritesModel {
     private Long id;
     private ApplicationUserModel creator;
     private Long blogPostId;
+
+    public FavoritesModel(){}
 }

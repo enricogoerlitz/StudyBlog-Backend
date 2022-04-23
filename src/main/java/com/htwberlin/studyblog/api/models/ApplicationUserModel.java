@@ -1,23 +1,17 @@
 package com.htwberlin.studyblog.api.models;
 
-import com.htwberlin.studyblog.api.authentication.JWTUser;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /** ApplicationUserModel
  *  Model for ApplicationUsers.
  */
-public class ApplicationUserModel extends JWTUser {
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class ApplicationUserModel {
     private Long id;
-
-    public ApplicationUserModel(Long id, String username, String role) {
-        super(username, role);
-        this.id = id;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
+    private String username;
+    private String role;
 }

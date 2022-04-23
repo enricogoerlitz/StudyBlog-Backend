@@ -1,9 +1,5 @@
 package com.htwberlin.studyblog.api.security;
 
-import com.htwberlin.studyblog.api.authentication.Role;
-import com.htwberlin.studyblog.api.security.httpFilter.CustomAuthenticationFilter;
-import com.htwberlin.studyblog.api.security.httpFilter.CustomAuthorizationFilter;
-import com.htwberlin.studyblog.api.utilities.Routes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,9 +11,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import static org.springframework.http.HttpMethod.*;
 
 /** SecurityConfig
  *  Class for Security configurations
@@ -38,7 +31,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
+/*
         // define authorizations of explicit routes
         http.authorizeRequests().antMatchers(POST, Routes.API + Routes.LOGIN + "/**").permitAll();
         http.authorizeRequests().antMatchers(GET, Routes.API + Routes.LOGIN + "/**").permitAll();
@@ -57,6 +50,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         customAuthFilter.setFilterProcessesUrl(Routes.API + Routes.LOGIN);
         http.addFilter(customAuthFilter);
         http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+
+ */
     }
 
     @Bean

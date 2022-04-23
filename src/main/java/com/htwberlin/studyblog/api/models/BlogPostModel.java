@@ -2,6 +2,7 @@ package com.htwberlin.studyblog.api.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Size;
 import java.util.Date;
@@ -10,6 +11,7 @@ import java.util.Date;
  *  Model for BlogPosts with title and content validation.
  */
 @AllArgsConstructor
+//@NoArgsConstructor
 @Data
 public class BlogPostModel {
     private Long id;
@@ -22,4 +24,6 @@ public class BlogPostModel {
     private Date lastEditDate;
     private Long creatorId;
     private boolean isFavorite;
+
+    public BlogPostModel(){}
 }

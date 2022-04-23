@@ -1,8 +1,7 @@
 package com.htwberlin.studyblog.api.authentication;
 
+import com.htwberlin.studyblog.api.models.ApplicationUserModel;
 import org.springframework.security.access.AuthorizationServiceException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 /** JWTVerificationResponse
  *  Class for JWT-Verification Response.
@@ -10,8 +9,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
  */
 public class JWTVerificationResponse {
     private final boolean isValid;
-    private UsernamePasswordAuthenticationToken authenticationToken;
     private String errorMessage = "";
+    private ApplicationUserModel user;
 
     /**
      * Constructor for invalid tokens.
@@ -26,11 +25,11 @@ public class JWTVerificationResponse {
     /**
      * Constructor for valid tokens.
      * @param isValid boolean is token valid
-     * @param authenticationToken UsernamePasswordAuthenticationToken
+     * @param user ApplicationUserModel
      */
-    public JWTVerificationResponse(boolean isValid, UsernamePasswordAuthenticationToken authenticationToken) {
+    public JWTVerificationResponse(boolean isValid, ApplicationUserModel user) {
         this.isValid = isValid;
-        this.authenticationToken = authenticationToken;
+        this.user = user;
     }
 
     /**
@@ -39,14 +38,6 @@ public class JWTVerificationResponse {
      */
     public boolean isValid() {
         return isValid;
-    }
-
-    /**
-     * Returns the UsernamePasswordAuthenticationToken if the token is valid.
-     * @return UsernamePasswordAuthenticationToken or Null.
-     */
-    public UsernamePasswordAuthenticationToken getAuthenticationToken() {
-        return authenticationToken;
     }
 
     /**
@@ -61,11 +52,8 @@ public class JWTVerificationResponse {
      * Returns the JWTUser, of the token is valid.
      * @return JWTUser or Null.
      */
-    public JWTUser getUser() {
-        return new JWTUser(
-            extractUsernameFromAuthToken(),
-            extractRoleFromAuthToken()
-        );
+    public ApplicationUserModel getUser() {
+        return user;
     }
 
     /**
@@ -77,29 +65,5 @@ public class JWTVerificationResponse {
             throw new AuthorizationServiceException("Current JWT-Token is invalid! \n" + errorMessage);
 
         return this;
-    }
-
-    /**
-     * Returns the Role of the authenticated user, if the token was valid. Else Null
-     * @return String Role of authenticated user or Null
-     */
-    private String extractRoleFromAuthToken() {
-        if(authenticationToken == null)
-            return null;
-
-        var roles = authenticationToken.getAuthorities().toArray();
-        if(roles.length == 0)
-            return null;
-
-        return ((SimpleGrantedAuthority)roles[0]).getAuthority();
-    }
-
-    /**
-     * Returns the Username of the authenticated user, if the token was valid. Else Null
-     * @return String Username of authenticated user or Null
-     */
-    private String extractUsernameFromAuthToken() {
-        if(authenticationToken == null) return null;
-        return authenticationToken.getName();
     }
 }

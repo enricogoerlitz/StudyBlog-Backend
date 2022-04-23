@@ -24,13 +24,15 @@ import static com.htwberlin.studyblog.api.utilities.ResponseEntityException.*;
 @RestController
 @RequestMapping(Routes.API)
 @RequiredArgsConstructor
+@Slf4j
 public class BlogPostController {
     private final BlogPostService blogPostService;
 
     @GetMapping(Routes.BLOGPOSTS)
     public ResponseEntity<List<BlogPostModel>> getBlogposts(HttpServletRequest request, HttpServletResponse response) {
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(blogPostService.getBlogPosts(request));
+           return ResponseEntity.status(HttpStatus.OK).body(blogPostService.getBlogPosts(request));
+           // return ResponseEntity.status(HttpStatus.OK).body(blogPostService.getBlogPosts(request));
         } catch(Exception exp) {
             return ResponseEntityExceptionManager.handleException(response, EXCEPTION, exp);
         }

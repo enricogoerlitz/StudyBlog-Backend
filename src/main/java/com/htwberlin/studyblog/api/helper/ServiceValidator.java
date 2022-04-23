@@ -1,7 +1,7 @@
 package com.htwberlin.studyblog.api.helper;
 
 import com.htwberlin.studyblog.api.authentication.ApplicationJWT;
-import com.htwberlin.studyblog.api.authentication.JWTUser;
+import com.htwberlin.studyblog.api.models.ApplicationUserModel;
 import com.htwberlin.studyblog.api.modelsEntity.ApplicationUserEntity;
 import com.htwberlin.studyblog.api.modelsEntity.BlogPostEntity;
 import com.htwberlin.studyblog.api.modelsEntity.FavoritesEntity;
@@ -39,7 +39,7 @@ public final class ServiceValidator {
      * @return JWTUser valid JWTUser
      * @throws Exception handling exception
      */
-    public static JWTUser getValidRequestUser(HttpServletRequest request) throws Exception {
+    public static ApplicationUserModel getValidRequestUser(HttpServletRequest request) throws Exception {
         return ObjectValidator.getValidObjOrThrowException(
             ApplicationJWT.getUserFromJWT(request),
             AUTHORIZATION_SERVICE_EXCEPTION,

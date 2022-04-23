@@ -59,7 +59,7 @@ public class UsersController {
     }
 
     @PutMapping(Routes.USERS_EDIT)
-    public ResponseEntity<ApplicationUserModel> updateUser(HttpServletRequest request, HttpServletResponse response, @Valid @RequestBody ApplicationUserEntity updatedUser) {
+    public ResponseEntity<String> updateUser(HttpServletRequest request, HttpServletResponse response, @Valid @RequestBody ApplicationUserEntity updatedUser) {
         try {
             var freshUpdatedUser = userService.updateUser(request, response, updatedUser);
             return ResponseEntity.status(HttpStatus.OK).body(freshUpdatedUser);
