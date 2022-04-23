@@ -142,6 +142,7 @@ public class ApplicationUserService implements UserDetailsService {
      */
     public ApplicationUserModel updateUserByAdmin(HttpServletRequest request, String id, ApplicationUserEntity updatedUser) throws Exception {
         Long dbUserId = PathVariableParser.parseLong(id);
+        validateUsername(updatedUser.getUsername());
         var manipulationDbUser = ServiceValidator.getValidDbUserById(userRepository, dbUserId);
 
         if(isManipulationUserAdmin(manipulationDbUser))
@@ -200,7 +201,8 @@ public class ApplicationUserService implements UserDetailsService {
      * @param updatedUser ApplicationUserEntity updatedUser
      */
     private void changePassword(ApplicationUserEntity manipulationDbUser, ApplicationUserEntity updatedUser) {
-        manipulationDbUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+        if(!updatedUser.getPassword().isBlank())
+            manipulationDbUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
     }
 
     /**
@@ -291,5 +293,10 @@ public class ApplicationUserService implements UserDetailsService {
             if(role.equals(validRole.name())) return;
         }
         throw new Exception("The entered role is not valid! Please enter a valid role.");
+    }
+
+    private void validateUsername(String username) throws Exception {
+        if(username.length() < 4 || username.length() > 50)
+            throw new Exception("Username needs a length of min 4 and max 50 characters!");
     }
 }

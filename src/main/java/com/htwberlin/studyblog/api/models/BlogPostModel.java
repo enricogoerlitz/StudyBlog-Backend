@@ -11,7 +11,7 @@ import java.util.Date;
  *  Model for BlogPosts with title and content validation.
  */
 @AllArgsConstructor
-//@NoArgsConstructor
+@NoArgsConstructor
 @Data
 public class BlogPostModel {
     private Long id;
@@ -23,7 +23,6 @@ public class BlogPostModel {
     private Date creationDate;
     private Date lastEditDate;
     private Long creatorId;
+    private String username;
     private boolean isFavorite;
-
-    public BlogPostModel(){}
 }

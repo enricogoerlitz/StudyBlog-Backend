@@ -36,7 +36,10 @@ public class AuthService {
      * @throws Exception handle exception
      */
     public ApplicationUserModel getCurrentUser(HttpServletRequest request) throws Exception {
-        return ApplicationJWT.getUserFromJWT(request);
+        var user = ApplicationJWT.getUserFromJWT(request);
+        if(user == null)
+            throw new AuthorizationServiceException("The RequestUser was null!");
+        return user;
     }
 
     public String loginUser(HttpServletRequest request, ApplicationUserEntity authUser) {

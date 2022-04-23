@@ -73,7 +73,7 @@ public class UsersController {
     }
 
     @PutMapping(Routes.USERS_ADMIN_ID)
-    public ResponseEntity<ApplicationUserModel> updateUserByAdmin(HttpServletRequest request, HttpServletResponse response, @Valid @RequestBody ApplicationUserEntity updatedUser, @PathVariable String id) {
+    public ResponseEntity<ApplicationUserModel> updateUserByAdmin(HttpServletRequest request, HttpServletResponse response, @RequestBody ApplicationUserEntity updatedUser, @PathVariable String id) {
         try {
             var freshUpdatedUser = userService.updateUserByAdmin(request, id, updatedUser);
             return ResponseEntity.status(HttpStatus.OK).body(freshUpdatedUser);

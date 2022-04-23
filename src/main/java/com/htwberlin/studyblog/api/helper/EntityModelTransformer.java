@@ -56,6 +56,7 @@ public final class EntityModelTransformer {
             blogPostEntity.getCreationDate(),
             blogPostEntity.getLastEditDate(),
             blogPostEntity.getCreator().getId(),
+            blogPostEntity.getCreator().getUsername(),
             isUserFavorite
         );
     }

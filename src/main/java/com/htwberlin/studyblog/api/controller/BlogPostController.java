@@ -32,7 +32,6 @@ public class BlogPostController {
     public ResponseEntity<List<BlogPostModel>> getBlogposts(HttpServletRequest request, HttpServletResponse response) {
         try {
            return ResponseEntity.status(HttpStatus.OK).body(blogPostService.getBlogPosts(request));
-           // return ResponseEntity.status(HttpStatus.OK).body(blogPostService.getBlogPosts(request));
         } catch(Exception exp) {
             return ResponseEntityExceptionManager.handleException(response, EXCEPTION, exp);
         }
