@@ -74,6 +74,7 @@ public final class ServiceValidator {
      * It tries to fetch the user by id from the DB.
      * If the result is not null, the valid DB-ApplicationUserEntity will be returned.
      * If the result is null, this method throws an exception.
+     * Also, it validates the authenticatedRoles for the access on the requested resources
      * @param id userId
      * @param userRepository ApplicationUserRepository
      * @return ApplicationUserEntity valid DbUser
@@ -97,6 +98,7 @@ public final class ServiceValidator {
      * It tries to fetch the user by username from the DB.
      * If the result is not null, the valid DB-ApplicationUserEntity will be returned.
      * If the result is null, this method throws an exception.
+     * Also, it validates the authenticatedRoles for the access on the requested resources
      * @param username username
      * @param userRepository ApplicationUserRepository
      * @return ApplicationUserEntity valid DbUser
@@ -186,7 +188,13 @@ public final class ServiceValidator {
                 .stream().map(fav -> fav.getBlogPost().getId()).collect(Collectors.toSet());
     }
 
-    public static void validateIsUserInRole(ApplicationUserEntity user, Role... authenticatedRoles) {
+    /**
+     * Validates, whether the user has the one of the passed roles.
+     * Throws an AuthorizationServiceException, if the user is not in the role and so unauthorized.
+     * @param user ApplicationUserEntity
+     * @param authenticatedRoles Authorized Roles
+     */
+    public static void validateIsUserInRole(ApplicationUserEntity user, Role... authenticatedRoles) throws AuthorizationServiceException {
         if(authenticatedRoles.length == 0)
             return;
         for(var role : authenticatedRoles) {
@@ -196,6 +204,15 @@ public final class ServiceValidator {
         throw new AuthorizationServiceException("User with role " + user.getRole() + " ist not allowed to access this route!");
     }
 
+    /**
+     * Validates, whether the user has the one of the passed roles.
+     * The user will be fetched by the request.
+     * Throws an AuthorizationServiceException, if the user is not in the role and so unauthorized.
+     * @param request
+     * @param userRepository
+     * @param authenticatedRoles
+     * @throws Exception
+     */
     public static void validateIsUserInRole(HttpServletRequest request, ApplicationUserRepository userRepository, Role... authenticatedRoles) throws Exception {
         validateIsUserInRole(getValidDbUserFromRequest(request, userRepository), authenticatedRoles);
     }

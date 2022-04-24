@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
  *  Model for ApplicationUsers.
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class ApplicationUserModel {
     private Long id;
     private String username;

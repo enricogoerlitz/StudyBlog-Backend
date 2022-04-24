@@ -15,7 +15,7 @@ import javax.validation.constraints.Size;
  */
 @Entity(name = "users")
 @Data
-//@NoArgsConstructor
+@NoArgsConstructor
 @AllArgsConstructor
 public class ApplicationUserEntity {
     @Id
@@ -33,6 +33,4 @@ public class ApplicationUserEntity {
 
     @Column(name = "role", nullable = false)
     private String role;
-
-    public ApplicationUserEntity(){}
 }

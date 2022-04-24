@@ -45,7 +45,7 @@ public class StudyblogApplication {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				getInitUserBlogPosts(user, 4).forEach(post -> {
+				getInitUserBlogPosts(user, 3).forEach(post -> {
 					var addedPost = blogPostService.addBlogPostDEV(post);
 					getInitFavourites(user, addedPost).forEach(fav -> favouriteService.addFavoriteDEV(user, addedPost));
 				});
@@ -65,9 +65,9 @@ public class StudyblogApplication {
 	 * @return List<ApplicationUserEntity>
 	 */
 	private List<ApplicationUserEntity> getInitUsers() {
-		var admin = new ApplicationUserEntity(1l,"admin", ENV.getAdminPassword(), Role.ADMIN.name());
-		var root = new ApplicationUserEntity(2l,"root", ENV.getRootPassword(), Role.ADMIN.name());
-		var testStudent = new ApplicationUserEntity(3l,"teststudent", ENV.getStudentPassword(), Role.STUDENT.name());
+		var admin = new ApplicationUserEntity(1L,"admin", ENV.getAdminPassword(), Role.ADMIN.name());
+		var root = new ApplicationUserEntity(2L,"root", ENV.getRootPassword(), Role.ADMIN.name());
+		var testStudent = new ApplicationUserEntity(3L,"teststudent", ENV.getStudentPassword(), Role.STUDENT.name());
 
 		return Arrays.asList(admin, root, testStudent);
 	}
@@ -81,10 +81,11 @@ public class StudyblogApplication {
 	private List<BlogPostEntity> getInitUserBlogPosts(ApplicationUserEntity user, int postCounts) {
 		var posts = new ArrayList<BlogPostEntity>();
 		for(int i = 0; i < postCounts; i++) {
+			long id = (user.getId() - 1) * postCounts + i + 1;
 			posts.add(new BlogPostEntity(
-				null,
+				id,
 				"Blogpost" + i + " from user: " + user.getUsername(),
-				"Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et.",
+				"Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam.",
 				new Date(),
 				null,
 				user,

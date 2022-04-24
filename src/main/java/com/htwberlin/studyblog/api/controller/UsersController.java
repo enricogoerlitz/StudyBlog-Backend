@@ -19,7 +19,6 @@ import java.util.List;
 
 import static com.htwberlin.studyblog.api.utilities.ResponseEntityException.*;
 
-//update user => refresh cookie in client! => HTTP.POST(/login) -> fetch new Auth JWT
 /** UsersController
  *  RESTController for User-Routes
  */

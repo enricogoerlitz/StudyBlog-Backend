@@ -2,18 +2,16 @@ package com.htwberlin.studyblog.api.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 /** FavoritesModel
  *  Model for UserBlogPostFavorites.
  */
 @Data
-//@RequiredArgsConstructor
+@NoArgsConstructor
 @AllArgsConstructor
 public class FavoritesModel {
     private Long id;
     private ApplicationUserModel creator;
     private Long blogPostId;
-
-    public FavoritesModel(){}
 }

@@ -23,7 +23,6 @@ import java.util.Set;
  */
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class FavoritesService {
     private final FavoriteRepository favouritesRepository;
     private final ApplicationUserRepository userRepository;

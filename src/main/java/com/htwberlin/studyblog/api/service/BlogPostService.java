@@ -23,7 +23,6 @@ import java.util.List;
  */
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class BlogPostService {
     private final BlogPostRepository blogPostRepository;
     private final ApplicationUserRepository userRepository;

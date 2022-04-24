@@ -13,17 +13,10 @@ import com.htwberlin.studyblog.api.helper.ObjectValidator;
 import com.htwberlin.studyblog.api.helper.PathVariableParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.transaction.Transactional;
 import java.util.List;
 
 import static com.htwberlin.studyblog.api.utilities.ResponseEntityException.EXCEPTION;
@@ -33,7 +26,6 @@ import static com.htwberlin.studyblog.api.utilities.ResponseEntityException.EXCE
  */
 @Service
 @RequiredArgsConstructor
-@Transactional
 @Slf4j
 public class ApplicationUserService {
     private final ApplicationUserRepository userRepository;
@@ -73,6 +65,14 @@ public class ApplicationUserService {
         return EntityModelTransformer.userEntityToModel(userRepository.save(user));
     }
 
+    /**
+     * This route is for admin-users only.
+     * Validates, that the requestUser is an admin.
+     * @param request http.request
+     * @param user ApplicationUserEntity
+     * @return ApplicationUserModel registered User
+     * @throws Exception handle exception
+     */
     public ApplicationUserModel registerUserByAdmin(HttpServletRequest request, ApplicationUserEntity user) throws Exception {
         ServiceValidator.validateIsUserInRole(request, userRepository, Role.ADMIN);
         return registerUser(user);
@@ -275,6 +275,12 @@ public class ApplicationUserService {
         throw new Exception("The entered role is not valid! Please enter a valid role.");
     }
 
+    /**
+     * Validates, that the username has a size of min 5 and max 49
+     * (needs to disable @Valid, because the password can be null by updating)
+     * @param username String
+     * @throws Exception handle exception
+     */
     private void validateUsername(String username) throws Exception {
         if(username.length() < 4 || username.length() > 50)
             throw new Exception("Username needs a length of min 4 and max 50 characters!");
