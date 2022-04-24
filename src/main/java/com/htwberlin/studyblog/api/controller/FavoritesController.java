@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.naming.AuthenticationException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Set;
 
 import static com.htwberlin.studyblog.api.utilities.ResponseEntityException.*;
@@ -28,42 +27,42 @@ public class FavoritesController {
     private final FavoritesService favoritesService;
 
     @GetMapping(Routes.FAVORITES)
-    public ResponseEntity<Set<Long>> getFavoritesByUser(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<Set<Long>> getFavoritesByUser(HttpServletRequest request) {
         try {
             var favorites = favoritesService.getFavoritesByCreator(request);
             return ResponseEntity.status(HttpStatus.OK).body(favorites);
         } catch (AuthenticationException exp) {
-            return ResponseEntityExceptionManager.handleException(response, AUTHORIZATION_SERVICE_EXCEPTION, exp);
+            return ResponseEntityExceptionManager.handleException(AUTHORIZATION_SERVICE_EXCEPTION, exp);
         } catch (Exception exp) {
-            return ResponseEntityExceptionManager.handleException(response, EXCEPTION, exp);
+            return ResponseEntityExceptionManager.handleException(EXCEPTION, exp);
         }
     }
 
     @PostMapping(Routes.FAVORITES_ID)
-    public ResponseEntity<FavoritesModel> addFavoriteToUser(HttpServletRequest request, HttpServletResponse response, @PathVariable String id) {
+    public ResponseEntity<FavoritesModel> addFavoriteToUser(HttpServletRequest request, @PathVariable String id) {
         try {
             var addedFavorite = favoritesService.addFavorite(request, id);
             return ResponseEntity.status(HttpStatus.CREATED).body(addedFavorite);
         } catch (AuthenticationException exp) {
-            return ResponseEntityExceptionManager.handleException(response, AUTHORIZATION_SERVICE_EXCEPTION, exp);
+            return ResponseEntityExceptionManager.handleException(AUTHORIZATION_SERVICE_EXCEPTION, exp);
         } catch (DuplicateKeyException exp) {
-            return ResponseEntityExceptionManager.handleException(response, DUPLICATE_KEY_EXCEPTION, exp);
+            return ResponseEntityExceptionManager.handleException(DUPLICATE_KEY_EXCEPTION, exp);
         } catch (Exception exp) {
-            return ResponseEntityExceptionManager.handleException(response, EXCEPTION, exp);
+            return ResponseEntityExceptionManager.handleException(EXCEPTION, exp);
         }
     }
 
     @DeleteMapping(Routes.FAVORITES_ID)
-    public ResponseEntity<Void> deleteFavorite(HttpServletRequest request, HttpServletResponse response, @PathVariable String id) {
+    public ResponseEntity<Void> deleteFavorite(HttpServletRequest request, @PathVariable String id) {
         try {
             favoritesService.removeFavorite(request, id);
             return ResponseEntity.status(HttpStatus.OK).build();
         } catch (AuthenticationException exp) {
-            return ResponseEntityExceptionManager.handleException(response, AUTHENTICATION_EXCEPTION, exp);
+            return ResponseEntityExceptionManager.handleException(AUTHENTICATION_EXCEPTION, exp);
         }catch (AuthorizationServiceException exp) {
-            return ResponseEntityExceptionManager.handleException(response, AUTHORIZATION_SERVICE_EXCEPTION, exp);
+            return ResponseEntityExceptionManager.handleException(AUTHORIZATION_SERVICE_EXCEPTION, exp);
         } catch(Exception exp) {
-            return ResponseEntityExceptionManager.handleException(response, EXCEPTION, exp);
+            return ResponseEntityExceptionManager.handleException(EXCEPTION, exp);
         }
     }
 }

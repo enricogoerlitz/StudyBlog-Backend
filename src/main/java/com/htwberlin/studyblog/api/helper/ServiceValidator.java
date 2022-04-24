@@ -208,10 +208,10 @@ public final class ServiceValidator {
      * Validates, whether the user has the one of the passed roles.
      * The user will be fetched by the request.
      * Throws an AuthorizationServiceException, if the user is not in the role and so unauthorized.
-     * @param request
-     * @param userRepository
-     * @param authenticatedRoles
-     * @throws Exception
+     * @param request http.request
+     * @param userRepository ApplicationUserRepository
+     * @param authenticatedRoles Roles[]
+     * @throws Exception handle exception
      */
     public static void validateIsUserInRole(HttpServletRequest request, ApplicationUserRepository userRepository, Role... authenticatedRoles) throws Exception {
         validateIsUserInRole(getValidDbUserFromRequest(request, userRepository), authenticatedRoles);

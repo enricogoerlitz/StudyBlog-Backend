@@ -1,17 +1,16 @@
 package com.htwberlin.studyblog.api.utilities;
 
-import com.htwberlin.studyblog.api.helper.HttpResponseWriter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
-import javax.servlet.http.HttpServletResponse;
 
 /** ResponseEntityExceptionManager
  *  Static Class for handle ResponseEntityExceptions and sent correct statusCodes
  */
+@Slf4j
 public final class ResponseEntityExceptionManager {
-    public static <T> ResponseEntity<T> handleException(HttpServletResponse response, ResponseEntityException exceptionType, Exception exp) {
-        HttpResponseWriter.writeJsonResponse(response, HttpResponseWriter.error(exp));
+    public static <T> ResponseEntity<T> handleException(ResponseEntityException exceptionType, Exception exp) {
+        log.warn("EXCEPTION: " + exp.getMessage());
         switch (exceptionType) {
             case AUTHORIZATION_SERVICE_EXCEPTION:
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

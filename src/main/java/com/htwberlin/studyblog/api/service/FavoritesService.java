@@ -15,7 +15,6 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.transaction.Transactional;
 import java.util.Set;
 
 /** FavoritesService
@@ -43,14 +42,11 @@ public class FavoritesService {
      * Saves a Favorite without any validation.
      * @param creator ApplicationUserEntity
      * @param blogPost BlogPostEntity
-     * @return FavoritesModel
      */
-    public FavoritesModel addFavoriteDEV(ApplicationUserEntity creator, BlogPostEntity blogPost) {
-        if(creator == null || blogPost == null) return null;
+    public void addFavoriteDEV(ApplicationUserEntity creator, BlogPostEntity blogPost) {
+        if(creator == null || blogPost == null) return;
         var favoriteEntity = new FavoritesEntity(null, creator, blogPost);
-        var addedFavoriteEntity = favouritesRepository.save(favoriteEntity);
-
-        return EntityModelTransformer.favoritesEntityToModel(addedFavoriteEntity);
+        favouritesRepository.save(favoriteEntity);
     }
 
     /**

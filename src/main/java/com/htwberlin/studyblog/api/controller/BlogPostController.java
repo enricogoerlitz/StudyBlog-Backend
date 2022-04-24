@@ -12,7 +12,6 @@ import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -29,71 +28,71 @@ public class BlogPostController {
     private final BlogPostService blogPostService;
 
     @GetMapping(Routes.BLOGPOSTS)
-    public ResponseEntity<List<BlogPostModel>> getBlogposts(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<List<BlogPostModel>> getBlogposts(HttpServletRequest request) {
         try {
            return ResponseEntity.status(HttpStatus.OK).body(blogPostService.getBlogPosts(request));
         } catch(Exception exp) {
-            return ResponseEntityExceptionManager.handleException(response, EXCEPTION, exp);
+            return ResponseEntityExceptionManager.handleException(EXCEPTION, exp);
         }
     }
 
     @PostMapping(Routes.BLOGPOSTS)
-    public ResponseEntity<BlogPostModel> addBlogPost(HttpServletRequest request, HttpServletResponse response, @Valid @RequestBody BlogPostModel blogPost) {
+    public ResponseEntity<BlogPostModel> addBlogPost(HttpServletRequest request, @Valid @RequestBody BlogPostModel blogPost) {
         try {
             var addedBlogPost = blogPostService.addBlogpost(request, blogPost);
             return ResponseEntity.status(HttpStatus.CREATED).body(addedBlogPost);
         } catch (AuthorizationServiceException exp) {
-            return ResponseEntityExceptionManager.handleException(response, AUTHORIZATION_SERVICE_EXCEPTION, exp);
+            return ResponseEntityExceptionManager.handleException(AUTHORIZATION_SERVICE_EXCEPTION, exp);
         } catch (Exception exp) {
-            return ResponseEntityExceptionManager.handleException(response, EXCEPTION, exp);
+            return ResponseEntityExceptionManager.handleException(EXCEPTION, exp);
         }
     }
 
     @PutMapping(Routes.BLOGPOSTS)
-    public ResponseEntity<BlogPostModel> updateBlogPost(HttpServletRequest request, HttpServletResponse response, @Valid @RequestBody BlogPostModel blogPost) {
+    public ResponseEntity<BlogPostModel> updateBlogPost(HttpServletRequest request, @Valid @RequestBody BlogPostModel blogPost) {
         try {
             var updatedBlogPost = blogPostService.updateBlogPost(request, blogPost);
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(updatedBlogPost);
         } catch(AuthorizationServiceException exp) {
-            return ResponseEntityExceptionManager.handleException(response, AUTHORIZATION_SERVICE_EXCEPTION, exp);
+            return ResponseEntityExceptionManager.handleException(AUTHORIZATION_SERVICE_EXCEPTION, exp);
         } catch(Exception exp) {
-            return ResponseEntityExceptionManager.handleException(response, EXCEPTION, exp);
+            return ResponseEntityExceptionManager.handleException(EXCEPTION, exp);
         }
     }
 
     @PutMapping(Routes.ADMIN_BLOGPOSTS)
-    public ResponseEntity<BlogPostModel> updateBlogPostByAdmin(HttpServletRequest request, HttpServletResponse response, @Valid @RequestBody BlogPostModel blogPost) {
+    public ResponseEntity<BlogPostModel> updateBlogPostByAdmin(HttpServletRequest request, @Valid @RequestBody BlogPostModel blogPost) {
         try {
             var updatedBlogPost = blogPostService.updateBlogPostByAdmin(request, blogPost);
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(updatedBlogPost);
         } catch (Exception exp) {
-            return ResponseEntityExceptionManager.handleException(response, EXCEPTION, exp);
+            return ResponseEntityExceptionManager.handleException(EXCEPTION, exp);
         }
     }
 
     @DeleteMapping(Routes.BLOGPOSTS + "/{id}")
-    public ResponseEntity<Void> deleteBlogPost(HttpServletRequest request, HttpServletResponse response, @PathVariable String id) {
+    public ResponseEntity<Void> deleteBlogPost(HttpServletRequest request, @PathVariable String id) {
         try {
             blogPostService.deleteBlogPost(request, id);
             return ResponseEntity.status(HttpStatus.ACCEPTED).build();
         } catch (AuthorizationServiceException exp) {
-            return ResponseEntityExceptionManager.handleException(response, AUTHORIZATION_SERVICE_EXCEPTION, exp);
+            return ResponseEntityExceptionManager.handleException(AUTHORIZATION_SERVICE_EXCEPTION, exp);
         } catch(IllegalArgumentException exp) {
-            return ResponseEntityExceptionManager.handleException(response, ILLEGAL_ARGUMENT_EXCEPTION, exp);
+            return ResponseEntityExceptionManager.handleException(ILLEGAL_ARGUMENT_EXCEPTION, exp);
         } catch (Exception exp) {
-            return ResponseEntityExceptionManager.handleException(response, EXCEPTION, exp);
+            return ResponseEntityExceptionManager.handleException(EXCEPTION, exp);
         }
     }
 
     @DeleteMapping(Routes.ADMIN_BLOGPOSTS + "/{id}")
-    public ResponseEntity<Void> deleteBlogPostByAdmin(HttpServletRequest request, HttpServletResponse response, @PathVariable String id) {
+    public ResponseEntity<Void> deleteBlogPostByAdmin(HttpServletRequest request, @PathVariable String id) {
         try {
             blogPostService.deleteBlogPostByAdmin(request, id);
             return ResponseEntity.status(HttpStatus.ACCEPTED).build();
         } catch(IllegalArgumentException exp) {
-            return ResponseEntityExceptionManager.handleException(response, ILLEGAL_ARGUMENT_EXCEPTION, exp);
+            return ResponseEntityExceptionManager.handleException(ILLEGAL_ARGUMENT_EXCEPTION, exp);
         } catch (Exception exp) {
-            return ResponseEntityExceptionManager.handleException(response, EXCEPTION, exp);
+            return ResponseEntityExceptionManager.handleException(EXCEPTION, exp);
         }
     }
 }
