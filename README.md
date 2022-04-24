@@ -1,7 +1,7 @@
 # README
 
 ### Description
-StudyBlog is an application for student to share there students life. <br />
+StudyBlog is an application for students to share there students life. <br />
 <br />
 #### Student-Role
 As a Student, you can create, edit or delete a BlogPost on/at a public page. <br />
