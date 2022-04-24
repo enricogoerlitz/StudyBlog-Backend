@@ -5,8 +5,8 @@ StudyBlog is an application for student to share there students life. <br />
 <br />
 #### Student-Role
 As a Student, you can create, edit or delete a BlogPost on/at a public page. <br />
-You can also favor posts you like. These post will be pushed up at the published date and marked as favourite. <br />
-At least, you can find posts by a full-text search and your favourites by button-click in the filter area.
+You can also favor posts you like. These post will be pushed up at the published date and marked as favorite. <br />
+At least, you can find posts by a full-text search and your favorites by button-click in the filter area.
 
 <br/>
 
@@ -23,7 +23,7 @@ Also, they can edit, or delete posts of students, if they publish offensive stuf
 <br />
 <br />
 
-### Used Ressources
+### Used Resources
 JWT & Auth:
 <br />
 https://www.youtube.com/watch?v=VVn9OG9nfH0
