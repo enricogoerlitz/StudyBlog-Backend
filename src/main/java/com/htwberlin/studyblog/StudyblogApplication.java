@@ -47,7 +47,6 @@ public class StudyblogApplication {
 				}
 				getInitUserBlogPosts(user, 3).forEach(post -> {
 					var addedPost = blogPostService.addBlogPostDEV(post);
-					getInitFavourites(user, addedPost).forEach(fav -> favouriteService.addFavoriteDEV(user, addedPost));
 				});
 				log.info("User " + user.getUsername() + " (" + user.getRole() + ") added to DB.");
 			});
@@ -84,7 +83,7 @@ public class StudyblogApplication {
 			long id = (user.getId() - 1) * postCounts + i + 1;
 			posts.add(new BlogPostEntity(
 				id,
-				"Blogpost" + i + " from user: " + user.getUsername(),
+				"Blogpost" + id + " from user: " + user.getUsername(),
 				"Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam.",
 				new Date(),
 				null,
@@ -94,16 +93,5 @@ public class StudyblogApplication {
 		}
 
 		return posts;
-	}
-
-	/**
-	 * DEVELOPMENT
-	 * @param user _
-	 * @param blogPost _
-	 * @return _
-	 */
-	private List<FavoritesEntity> getInitFavourites(ApplicationUserEntity user, BlogPostEntity blogPost) {
-		var fav1 = new FavoritesEntity(null, user, blogPost);
-		return List.of(fav1);
 	}
 }

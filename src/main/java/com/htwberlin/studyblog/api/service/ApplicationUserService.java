@@ -17,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
 import java.util.List;
 
 import static com.htwberlin.studyblog.api.utilities.ResponseEntityException.EXCEPTION;
@@ -26,6 +27,7 @@ import static com.htwberlin.studyblog.api.utilities.ResponseEntityException.EXCE
  */
 @Service
 @RequiredArgsConstructor
+@Transactional
 @Slf4j
 public class ApplicationUserService {
     private final ApplicationUserRepository userRepository;
@@ -48,9 +50,9 @@ public class ApplicationUserService {
      * @param initialRole String The role, what the user should get
      * @return ApplicationUserModel
      */
-    public ApplicationUserModel registerUser(ApplicationUserEntity user, String initialRole) throws Exception {
+    public String registerUser(HttpServletRequest request, ApplicationUserEntity user, String initialRole) throws Exception {
         user.setRole(initialRole);
-        return registerUser(user);
+        return ApplicationJWT.createUserModelToken(request, registerUser(user));
     }
 
     /**
@@ -59,10 +61,10 @@ public class ApplicationUserService {
      * @param user The userdata, which should be registered (by admin, incl. role)
      * @return ApplicationUserModel
      */
-    public ApplicationUserModel registerUser(ApplicationUserEntity user) throws Exception {
+    public ApplicationUserEntity registerUser(ApplicationUserEntity user) throws Exception {
         validateRole(user.getRole());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return EntityModelTransformer.userEntityToModel(userRepository.save(user));
+        return userRepository.save(user);
     }
 
     /**
@@ -75,7 +77,7 @@ public class ApplicationUserService {
      */
     public ApplicationUserModel registerUserByAdmin(HttpServletRequest request, ApplicationUserEntity user) throws Exception {
         ServiceValidator.validateIsUserInRole(request, userRepository, Role.ADMIN);
-        return registerUser(user);
+        return EntityModelTransformer.userEntityToModel(registerUser(user));
     }
 
     /**

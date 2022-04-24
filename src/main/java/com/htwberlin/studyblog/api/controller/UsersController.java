@@ -37,9 +37,9 @@ public class UsersController {
     }
 
     @PostMapping(Routes.USERS)
-    public ResponseEntity<ApplicationUserModel> registerUser(@Valid @RequestBody ApplicationUserEntity newUser) {
+    public ResponseEntity<String> registerUser(HttpServletRequest request, @Valid @RequestBody ApplicationUserEntity newUser) {
         try {
-            var createdUser = userService.registerUser(newUser, Role.STUDENT.name());
+            var createdUser = userService.registerUser(request, newUser, Role.STUDENT.name());
             return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
         } catch (Exception exp) {
             return ResponseEntityExceptionManager.handleException(EXCEPTION, exp);
