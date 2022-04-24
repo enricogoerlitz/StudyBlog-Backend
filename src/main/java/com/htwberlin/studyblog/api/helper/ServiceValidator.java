@@ -1,6 +1,7 @@
 package com.htwberlin.studyblog.api.helper;
 
 import com.htwberlin.studyblog.api.authentication.ApplicationJWT;
+import com.htwberlin.studyblog.api.authentication.Role;
 import com.htwberlin.studyblog.api.models.ApplicationUserModel;
 import com.htwberlin.studyblog.api.modelsEntity.ApplicationUserEntity;
 import com.htwberlin.studyblog.api.modelsEntity.BlogPostEntity;
@@ -62,9 +63,9 @@ public final class ServiceValidator {
      * @return ApplicationUserEntity valid DbUser
      * @throws Exception handling exception
      */
-    public static ApplicationUserEntity getValidDbUserFromRequest(HttpServletRequest request, ApplicationUserRepository userRepository) throws Exception {
+    public static ApplicationUserEntity getValidDbUserFromRequest(HttpServletRequest request, ApplicationUserRepository userRepository, Role... authenticatedRoles) throws Exception {
         var requestUser = getValidRequestUser(request);
-        return getValidDbUserByUsername(userRepository, requestUser.getUsername());
+        return getValidDbUserByUsername(userRepository, requestUser.getUsername(), authenticatedRoles);
     }
 
     /**
@@ -78,13 +79,16 @@ public final class ServiceValidator {
      * @return ApplicationUserEntity valid DbUser
      * @throws Exception handling exception
      */
-    public static ApplicationUserEntity getValidDbUserById(ApplicationUserRepository userRepository, Long id) throws Exception {
+    public static ApplicationUserEntity getValidDbUserById(ApplicationUserRepository userRepository, Long id, Role... authenticatedRoles) throws Exception {
         var optionalUser = userRepository.findById(id);
-        return ObjectValidator.getValidObjOrThrowException(
+        var validDbUser = ObjectValidator.getValidObjOrThrowException(
             optionalUser.isEmpty() ? null : optionalUser.get(),
             ILLEGAL_ARGUMENT_EXCEPTION,
             "Could not find user with id " + id + " in the DB!"
         );
+        validateIsUserInRole(validDbUser, authenticatedRoles);
+
+        return validDbUser;
     }
 
     /**
@@ -98,12 +102,15 @@ public final class ServiceValidator {
      * @return ApplicationUserEntity valid DbUser
      * @throws Exception handling exception
      */
-    public static ApplicationUserEntity getValidDbUserByUsername(ApplicationUserRepository userRepository, String username) throws Exception {
-        return ObjectValidator.getValidObjOrThrowException(
+    public static ApplicationUserEntity getValidDbUserByUsername(ApplicationUserRepository userRepository, String username, Role... authenticatedRoles) throws Exception {
+        var validDbUser = ObjectValidator.getValidObjOrThrowException(
             userRepository.findByUsername(username),
             USERNAME_NOT_FOUND_EXCEPTION,
             "Could not find user with username " + username + " in the DB!"
         );
+        validateIsUserInRole(validDbUser, authenticatedRoles);
+
+        return  validDbUser;
     }
 
     /**
@@ -177,6 +184,20 @@ public final class ServiceValidator {
     public static Set<Long> getValidUserFavoriteBlogPostIdsByRequestAsSet(HttpServletRequest request, FavoriteRepository favoriteRepository) throws Exception {
         return getValidUserFavoriteBlogPostsByRequest(request, favoriteRepository)
                 .stream().map(fav -> fav.getBlogPost().getId()).collect(Collectors.toSet());
+    }
+
+    public static void validateIsUserInRole(ApplicationUserEntity user, Role... authenticatedRoles) {
+        if(authenticatedRoles.length == 0)
+            return;
+        for(var role : authenticatedRoles) {
+            if(role.name().equals(user.getRole()))
+                return;
+        }
+        throw new AuthorizationServiceException("User with role " + user.getRole() + " ist not allowed to access this route!");
+    }
+
+    public static void validateIsUserInRole(HttpServletRequest request, ApplicationUserRepository userRepository, Role... authenticatedRoles) throws Exception {
+        validateIsUserInRole(getValidDbUserFromRequest(request, userRepository), authenticatedRoles);
     }
 
     /**

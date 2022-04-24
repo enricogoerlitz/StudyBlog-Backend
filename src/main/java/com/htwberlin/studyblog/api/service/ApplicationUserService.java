@@ -35,41 +35,18 @@ import static com.htwberlin.studyblog.api.utilities.ResponseEntityException.EXCE
 @RequiredArgsConstructor
 @Transactional
 @Slf4j
-public class ApplicationUserService implements UserDetailsService {
+public class ApplicationUserService {
     private final ApplicationUserRepository userRepository;
     private final BlogPostRepository blogPostRepository;
     private final FavoriteRepository favoriteRepository;
     private final PasswordEncoder passwordEncoder;
 
     /**
-     * Overrides a method fpr user-authentication. By request to /api/v1/login
-     * the authentication-process gets triggered and trys to find a user in the DB by username.
-     * If the method can find a user by his username in the DB, its return an auth-user
-     * otherwise it throws an error (UsernameNotFoundException).
-     * @param username username of the post-param 'username'
-     * @return UserDetails
-     * @throws UsernameNotFoundException if user could not be found by username, throw this exception
-     */
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        var existingUser = userRepository.findByUsername(username);
-        if(existingUser == null) {
-            log.error("User with username {} not found", username);
-            throw new UsernameNotFoundException("User not found");
-        }
-
-        return new User(
-            existingUser.getUsername(),
-            existingUser.getPassword(),
-            List.of(new SimpleGrantedAuthority(existingUser.getRole()))
-        );
-    }
-
-    /**
      * Fetches all users from the DB and transforms the entities to models.
      * @return List<ApplicationUserModel>
      */
-    public List<ApplicationUserModel> getUsers() {
+    public List<ApplicationUserModel> getUsers(HttpServletRequest request) throws Exception {
+        ServiceValidator.validateIsUserInRole(request, userRepository, Role.ADMIN);
         return EntityModelTransformer.userEntitiesToModels(userRepository.findAll());
     }
 
@@ -96,19 +73,23 @@ public class ApplicationUserService implements UserDetailsService {
         return EntityModelTransformer.userEntityToModel(userRepository.save(user));
     }
 
+    public ApplicationUserModel registerUserByAdmin(HttpServletRequest request, ApplicationUserEntity user) throws Exception {
+        ServiceValidator.validateIsUserInRole(request, userRepository, Role.ADMIN);
+        return registerUser(user);
+    }
+
     /**
      * This Route manipulates the data of the request-user.
      * Updates the logged user (from JWT-Token).
      * It updates the username and password, if they had changed.
      * Fetches the user from the db by the JWT-Request-Token.
      * @param request http.request
-     * @param response http.response
      * @param updatedUser the userdata, which should updated to the DB.
      * @return ApplicationUserModel
      * @throws Exception handling exception
      */
-    public String updateUser(HttpServletRequest request, HttpServletResponse response, ApplicationUserEntity updatedUser) throws Exception {
-        var manipulationDbUser = ServiceValidator.getValidDbUserFromRequest(request, userRepository);
+    public String updateUser(HttpServletRequest request, ApplicationUserEntity updatedUser) throws Exception {
+        var manipulationDbUser = ServiceValidator.getValidDbUserFromRequest(request, userRepository, Role.STUDENT, Role.ADMIN);
         validateRole(manipulationDbUser.getRole());
         updatedUser.setId(manipulationDbUser.getId());
         updatedUser.setRole(manipulationDbUser.getRole());
@@ -120,8 +101,6 @@ public class ApplicationUserService implements UserDetailsService {
             EXCEPTION,
             "User could not be updated!"
         );
-
-        //ApplicationJWT.refreshJWTCookie(request, response, savedUpdatedUser);
 
         return ApplicationJWT.createUserModelToken(request, savedUpdatedUser);
     }
@@ -141,6 +120,7 @@ public class ApplicationUserService implements UserDetailsService {
      * @throws Exception handling exception
      */
     public ApplicationUserModel updateUserByAdmin(HttpServletRequest request, String id, ApplicationUserEntity updatedUser) throws Exception {
+        ServiceValidator.validateIsUserInRole(request, userRepository, Role.ADMIN);
         Long dbUserId = PathVariableParser.parseLong(id);
         validateUsername(updatedUser.getUsername());
         var manipulationDbUser = ServiceValidator.getValidDbUserById(userRepository, dbUserId);
@@ -167,7 +147,7 @@ public class ApplicationUserService implements UserDetailsService {
      */
     public void deleteUser(HttpServletRequest request, String id) throws Exception {
         Long userId = PathVariableParser.parseLong(id);
-        var delDbUser = ServiceValidator.getValidDbUserById(userRepository, userId);
+        var delDbUser = ServiceValidator.getValidDbUserById(userRepository, userId, Role.STUDENT, Role.ADMIN);
 
         if(isManipulationUserAdmin(delDbUser))
             checkRequestUserIsAuthorizedToDeleteAdminUser(request, delDbUser);

@@ -1,6 +1,7 @@
 package com.htwberlin.studyblog.api.service;
 
 import com.htwberlin.studyblog.api.authentication.ApplicationJWT;
+import com.htwberlin.studyblog.api.authentication.Role;
 import com.htwberlin.studyblog.api.helper.ServiceValidator;
 import com.htwberlin.studyblog.api.helper.EntityModelTransformer;
 import com.htwberlin.studyblog.api.models.ApplicationUserModel;
@@ -39,15 +40,21 @@ public class AuthService {
         var user = ApplicationJWT.getUserFromJWT(request);
         if(user == null)
             throw new AuthorizationServiceException("The RequestUser was null!");
+
         return user;
+    }
+
+    public String loginVisitor(HttpServletRequest request) {
+        return ApplicationJWT.createUserModelToken(
+            request,
+            new ApplicationUserEntity(-1l, "VisitorUser", null, Role.VISITOR.name())
+        );
     }
 
     public String loginUser(HttpServletRequest request, ApplicationUserEntity authUser) {
         var dbUser = userRepository.findByUsername(authUser.getUsername());
         if(dbUser == null || !passwordEncoder.matches(authUser.getPassword(), dbUser.getPassword()))
             throw new AuthorizationServiceException("User ist not authorized!");
-        // set cookie
-        String token = ApplicationJWT.createUserModelToken(request, dbUser);
         return ApplicationJWT.createUserModelToken(request, dbUser);
     }
 }

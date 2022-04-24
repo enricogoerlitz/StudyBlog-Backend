@@ -30,9 +30,9 @@ public class UsersController {
     private final ApplicationUserService userService;
 
     @GetMapping(Routes.ADMIN_USERS)
-    public ResponseEntity<List<ApplicationUserModel>> getUsers(HttpServletResponse response) {
+    public ResponseEntity<List<ApplicationUserModel>> getUsers(HttpServletRequest request, HttpServletResponse response) {
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(userService.getUsers());
+            return ResponseEntity.status(HttpStatus.OK).body(userService.getUsers(request));
         } catch (Exception exp) {
             return ResponseEntityExceptionManager.handleException(response, EXCEPTION, exp);
         }
@@ -49,9 +49,9 @@ public class UsersController {
     }
 
     @PostMapping(Routes.ADMIN_USERS)
-    public ResponseEntity<ApplicationUserModel> registerUserByAdmin(HttpServletResponse response, @Valid @RequestBody ApplicationUserEntity newUser) {
+    public ResponseEntity<ApplicationUserModel> registerUserByAdmin(HttpServletRequest request, HttpServletResponse response, @Valid @RequestBody ApplicationUserEntity newUser) {
         try {
-            var createdUser = userService.registerUser(newUser);
+            var createdUser = userService.registerUserByAdmin(request, newUser);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
         } catch (Exception exp) {
             return ResponseEntityExceptionManager.handleException(response, EXCEPTION, exp);
@@ -61,8 +61,8 @@ public class UsersController {
     @PutMapping(Routes.USERS_EDIT)
     public ResponseEntity<String> updateUser(HttpServletRequest request, HttpServletResponse response, @Valid @RequestBody ApplicationUserEntity updatedUser) {
         try {
-            var freshUpdatedUser = userService.updateUser(request, response, updatedUser);
-            return ResponseEntity.status(HttpStatus.OK).body(freshUpdatedUser);
+            var freshUpdatedUser = userService.updateUser(request, updatedUser);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(freshUpdatedUser);
         } catch (AuthorizationServiceException exp) {
             return ResponseEntityExceptionManager.handleException(response, AUTHORIZATION_SERVICE_EXCEPTION, exp);
         } catch (IllegalArgumentException exp) {
@@ -76,7 +76,7 @@ public class UsersController {
     public ResponseEntity<ApplicationUserModel> updateUserByAdmin(HttpServletRequest request, HttpServletResponse response, @RequestBody ApplicationUserEntity updatedUser, @PathVariable String id) {
         try {
             var freshUpdatedUser = userService.updateUserByAdmin(request, id, updatedUser);
-            return ResponseEntity.status(HttpStatus.OK).body(freshUpdatedUser);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(freshUpdatedUser);
         } catch (AuthorizationServiceException exp) {
             return ResponseEntityExceptionManager.handleException(response, AUTHORIZATION_SERVICE_EXCEPTION, exp);
         } catch (IllegalArgumentException exp) {

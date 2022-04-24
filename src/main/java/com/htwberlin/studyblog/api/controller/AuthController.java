@@ -1,10 +1,8 @@
 package com.htwberlin.studyblog.api.controller;
 
-import com.htwberlin.studyblog.api.authentication.ApplicationJWT;
 import com.htwberlin.studyblog.api.models.ApplicationUserModel;
 import com.htwberlin.studyblog.api.modelsEntity.ApplicationUserEntity;
 import com.htwberlin.studyblog.api.service.AuthService;
-import com.htwberlin.studyblog.api.utilities.ResponseEntityExceptionManager;
 import com.htwberlin.studyblog.api.utilities.Routes;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,10 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static com.htwberlin.studyblog.api.utilities.ResponseEntityException.AUTHORIZATION_SERVICE_EXCEPTION;
-
-// Logout in Client => delete cookie!
-// update user => refresh cookie in client! => HTTP.POST(/login) -> fetch new Auth JWT
 /** AuthController
  *  RESTController for Authentication-Routes
  */
@@ -56,6 +50,11 @@ public class AuthController {
             log.error(exp.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
+    }
+
+    @GetMapping("/visitor")
+    public ResponseEntity<String> getVisitorToken(HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.OK).body(authService.loginVisitor(request));
     }
 
     // TODO: Refactor

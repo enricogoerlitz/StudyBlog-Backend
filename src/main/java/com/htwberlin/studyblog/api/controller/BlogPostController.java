@@ -42,6 +42,8 @@ public class BlogPostController {
         try {
             var addedBlogPost = blogPostService.addBlogpost(request, blogPost);
             return ResponseEntity.status(HttpStatus.CREATED).body(addedBlogPost);
+        } catch (AuthorizationServiceException exp) {
+            return ResponseEntityExceptionManager.handleException(response, AUTHORIZATION_SERVICE_EXCEPTION, exp);
         } catch (Exception exp) {
             return ResponseEntityExceptionManager.handleException(response, EXCEPTION, exp);
         }
@@ -60,9 +62,9 @@ public class BlogPostController {
     }
 
     @PutMapping(Routes.ADMIN_BLOGPOSTS)
-    public ResponseEntity<BlogPostModel> updateBlogPostByAdmin(HttpServletResponse response, @Valid @RequestBody BlogPostModel blogPost) {
+    public ResponseEntity<BlogPostModel> updateBlogPostByAdmin(HttpServletRequest request, HttpServletResponse response, @Valid @RequestBody BlogPostModel blogPost) {
         try {
-            var updatedBlogPost = blogPostService.updateBlogPostByAdmin(blogPost);
+            var updatedBlogPost = blogPostService.updateBlogPostByAdmin(request, blogPost);
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(updatedBlogPost);
         } catch (Exception exp) {
             return ResponseEntityExceptionManager.handleException(response, EXCEPTION, exp);
@@ -84,9 +86,9 @@ public class BlogPostController {
     }
 
     @DeleteMapping(Routes.ADMIN_BLOGPOSTS + "/{id}")
-    public ResponseEntity<Void> deleteBlogPostByAdmin(HttpServletResponse response, @PathVariable String id) {
+    public ResponseEntity<Void> deleteBlogPostByAdmin(HttpServletRequest request, HttpServletResponse response, @PathVariable String id) {
         try {
-            blogPostService.deleteBlogPostByAdmin(id);
+            blogPostService.deleteBlogPostByAdmin(request, id);
             return ResponseEntity.status(HttpStatus.ACCEPTED).build();
         } catch(IllegalArgumentException exp) {
             return ResponseEntityExceptionManager.handleException(response, ILLEGAL_ARGUMENT_EXCEPTION, exp);

@@ -1,5 +1,6 @@
 package com.htwberlin.studyblog.api.service;
 
+import com.htwberlin.studyblog.api.authentication.Role;
 import com.htwberlin.studyblog.api.helper.ServiceValidator;
 import com.htwberlin.studyblog.api.helper.EntityModelTransformer;
 import com.htwberlin.studyblog.api.models.BlogPostModel;
@@ -51,7 +52,7 @@ public class BlogPostService {
      * @throws Exception handle exception
      */
     public BlogPostModel addBlogpost(HttpServletRequest request, BlogPostModel blogPost) throws Exception {
-        var requestUser = getValidDbRequestUser(request);
+        var requestUser = getValidDbRequestUser(request, Role.STUDENT, Role.ADMIN);
 
         blogPost.setCreatorId(requestUser.getId());
         blogPost.setCreationDate(new Date());
@@ -87,7 +88,7 @@ public class BlogPostService {
     public BlogPostModel updateBlogPost(HttpServletRequest request, BlogPostModel blogPost) throws Exception {
         var dbBlogPost = getValidBlogPost(blogPost.getId());
         var dbBlogPostCreator = getValidDbBlogPostCreator(dbBlogPost.getCreator().getId());
-        var requestUser = getValidDbRequestUser(request);
+        var requestUser = getValidDbRequestUser(request, Role.STUDENT, Role.ADMIN);
 
         ServiceValidator.validateEqualUserIds(
             requestUser,
@@ -110,7 +111,8 @@ public class BlogPostService {
      * @return BlogPostModel
      * @throws Exception handle exception
      */
-    public BlogPostModel updateBlogPostByAdmin(BlogPostModel blogPost) throws Exception {
+    public BlogPostModel updateBlogPostByAdmin(HttpServletRequest request, BlogPostModel blogPost) throws Exception {
+        ServiceValidator.validateIsUserInRole(getValidDbRequestUser(request), Role.ADMIN);
         var dbBlogPost = getValidBlogPost(blogPost.getId());
         updateTitleAndContentOfBlogPost(dbBlogPost, blogPost);
 
@@ -148,7 +150,8 @@ public class BlogPostService {
      * By an error, this method throws an exception.
      * @param id String
      */
-    public void deleteBlogPostByAdmin(String id) {
+    public void deleteBlogPostByAdmin(HttpServletRequest request, String id) throws Exception {
+        ServiceValidator.validateIsUserInRole(getValidDbRequestUser(request), Role.ADMIN);
         Long blogPostId = PathVariableParser.parseLong(id);
         deleteAllFavoritesFKs(blogPostId);
         blogPostRepository.deleteById(blogPostId);
@@ -201,8 +204,8 @@ public class BlogPostService {
      * @return ApplicationUserEntity
      * @throws Exception handle exception
      */
-    private ApplicationUserEntity getValidDbRequestUser(HttpServletRequest request) throws Exception {
-        return ServiceValidator.getValidDbUserFromRequest(request, userRepository);
+    private ApplicationUserEntity getValidDbRequestUser(HttpServletRequest request, Role... authenticatedRoles) throws Exception {
+        return ServiceValidator.getValidDbUserFromRequest(request, userRepository, authenticatedRoles);
     }
 
     /**
