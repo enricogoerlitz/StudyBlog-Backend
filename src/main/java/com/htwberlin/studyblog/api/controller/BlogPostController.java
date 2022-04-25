@@ -30,7 +30,9 @@ public class BlogPostController {
     @GetMapping(Routes.BLOGPOSTS)
     public ResponseEntity<List<BlogPostModel>> getBlogposts(HttpServletRequest request) {
         try {
-           return ResponseEntity.status(HttpStatus.OK).body(blogPostService.getBlogPosts(request));
+            return ResponseEntity.status(HttpStatus.OK).body(blogPostService.getBlogPosts(request));
+        } catch (AuthorizationServiceException exp) {
+            return ResponseEntityExceptionManager.handleException(AUTHORIZATION_SERVICE_EXCEPTION, exp);
         } catch(Exception exp) {
             return ResponseEntityExceptionManager.handleException(EXCEPTION, exp);
         }
@@ -65,6 +67,8 @@ public class BlogPostController {
         try {
             var updatedBlogPost = blogPostService.updateBlogPostByAdmin(request, blogPost);
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(updatedBlogPost);
+        } catch(AuthorizationServiceException exp) {
+            return ResponseEntityExceptionManager.handleException(AUTHORIZATION_SERVICE_EXCEPTION, exp);
         } catch (Exception exp) {
             return ResponseEntityExceptionManager.handleException(EXCEPTION, exp);
         }

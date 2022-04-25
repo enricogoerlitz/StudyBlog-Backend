@@ -14,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
 
@@ -22,7 +21,6 @@ import java.util.List;
  *  Service for BlogPost BusinessLogic
  */
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class BlogPostService {
     private final BlogPostRepository blogPostRepository;

@@ -13,8 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
-import static com.htwberlin.studyblog.api.utilities.ResponseEntityException.AUTHORIZATION_SERVICE_EXCEPTION;
-import static com.htwberlin.studyblog.api.utilities.ResponseEntityException.EXCEPTION;
+import static com.htwberlin.studyblog.api.utilities.ResponseEntityException.*;
 
 /** AuthController
  *  RESTController for Authentication-Routes
@@ -36,27 +35,28 @@ public class AuthController {
             var currentUser = authService.getCurrentUser(request);
             return ResponseEntity.status(HttpStatus.OK).body(currentUser);
         } catch (AuthorizationServiceException exp) {
-            return ResponseEntityExceptionManager.handleException(AUTHORIZATION_SERVICE_EXCEPTION, exp);
+            return ResponseEntityExceptionManager.handleException(AUTHENTICATION_EXCEPTION, exp);
         } catch (Exception exp) {
-            return ResponseEntityExceptionManager.handleException(EXCEPTION, exp);
+            return ResponseEntityExceptionManager.handleException(AUTHORIZATION_SERVICE_EXCEPTION, exp);
         }
     }
 
     @GetMapping("/visitor")
     public ResponseEntity<String> getVisitorToken(HttpServletRequest request) {
-        return ResponseEntity.status(HttpStatus.OK).body(authService.loginVisitor(request));
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(authService.loginVisitor(request));
+        } catch (Exception exp) {
+            return ResponseEntityExceptionManager.handleException(EXCEPTION, exp);
+        }
     }
 
-    // TODO: Refactor
     @PostMapping("/login")
     public ResponseEntity<String> login(HttpServletRequest request, @RequestBody ApplicationUserEntity authUser) {
         try {
             var userToken = authService.loginUser(request, authUser);
             return ResponseEntity.status(HttpStatus.OK).body(userToken);
-        } catch (AuthorizationServiceException exp) {
-            return ResponseEntityExceptionManager.handleException(AUTHORIZATION_SERVICE_EXCEPTION, exp);
-        } catch(Exception exp) {
-            return ResponseEntityExceptionManager.handleException(EXCEPTION, exp);
+        } catch (Exception exp) {
+            return ResponseEntityExceptionManager.handleException(AUTHENTICATION_EXCEPTION, exp);
         }
     }
 }

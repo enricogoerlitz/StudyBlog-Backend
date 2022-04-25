@@ -12,14 +12,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.transaction.Transactional;
 
 /** AuthService
  *  Service for Authentication BusinessLogic
  */
 @Service
 @RequiredArgsConstructor
-@Transactional
 @Slf4j
 public class AuthService {
     private final ApplicationUserRepository userRepository;

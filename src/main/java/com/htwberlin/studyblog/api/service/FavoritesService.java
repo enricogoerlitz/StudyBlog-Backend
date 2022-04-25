@@ -15,14 +15,12 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.transaction.Transactional;
 import java.util.Set;
 
 /** FavoritesService
  *  Service for UserBlogPostFavorites BusinessLogic
  */
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class FavoritesService {
     private final FavoriteRepository favouritesRepository;

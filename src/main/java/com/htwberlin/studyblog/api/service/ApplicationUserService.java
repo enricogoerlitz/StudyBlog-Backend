@@ -17,7 +17,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.transaction.Transactional;
 import java.util.List;
 
 import static com.htwberlin.studyblog.api.utilities.ResponseEntityException.EXCEPTION;
@@ -27,7 +26,6 @@ import static com.htwberlin.studyblog.api.utilities.ResponseEntityException.EXCE
  */
 @Service
 @RequiredArgsConstructor
-@Transactional
 @Slf4j
 public class ApplicationUserService {
     private final ApplicationUserRepository userRepository;
