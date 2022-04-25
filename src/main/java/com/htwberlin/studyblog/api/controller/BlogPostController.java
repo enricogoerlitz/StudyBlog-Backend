@@ -12,6 +12,7 @@ import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -22,6 +23,7 @@ import static com.htwberlin.studyblog.api.utilities.ResponseEntityException.*;
  */
 @RestController
 @RequestMapping(Routes.API)
+@Transactional
 @RequiredArgsConstructor
 @Slf4j
 public class BlogPostController {

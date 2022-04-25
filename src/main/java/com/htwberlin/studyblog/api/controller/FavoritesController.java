@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.naming.AuthenticationException;
 import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
 import java.util.Set;
 
 import static com.htwberlin.studyblog.api.utilities.ResponseEntityException.*;
@@ -22,6 +23,7 @@ import static com.htwberlin.studyblog.api.utilities.ResponseEntityException.*;
  */
 @RestController
 @RequiredArgsConstructor
+@Transactional
 @RequestMapping(Routes.API)
 public class FavoritesController {
     private final FavoritesService favoritesService;

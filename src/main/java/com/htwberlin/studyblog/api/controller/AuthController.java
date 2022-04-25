@@ -12,6 +12,7 @@ import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
 
 import static com.htwberlin.studyblog.api.utilities.ResponseEntityException.*;
 
@@ -19,6 +20,7 @@ import static com.htwberlin.studyblog.api.utilities.ResponseEntityException.*;
  *  RESTController for Authentication-Routes
  */
 @RestController
+@Transactional
 @RequiredArgsConstructor
 @RequestMapping(Routes.API + Routes.V1 + Routes.AUTH)
 public class AuthController {
