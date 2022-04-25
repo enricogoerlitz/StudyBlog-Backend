@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 @Slf4j
 public final class ResponseEntityExceptionManager {
     public static <T> ResponseEntity<T> handleException(ResponseEntityException exceptionType, Exception exp) {
-        log.warn("EXCEPTION: " + exp.getMessage());
+        log.error("EXCEPTION: " + exp.getMessage());
         switch (exceptionType) {
             case AUTHORIZATION_SERVICE_EXCEPTION:
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
