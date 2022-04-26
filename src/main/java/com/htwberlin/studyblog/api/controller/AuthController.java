@@ -36,10 +36,8 @@ public class AuthController {
         try {
             var currentUser = authService.getCurrentUser(request);
             return ResponseEntity.status(HttpStatus.OK).body(currentUser);
-        } catch (AuthorizationServiceException exp) {
-            return ResponseEntityExceptionManager.handleException(AUTHENTICATION_EXCEPTION, exp);
         } catch (Exception exp) {
-            return ResponseEntityExceptionManager.handleException(AUTHORIZATION_SERVICE_EXCEPTION, exp);
+            return ResponseEntity.status(HttpStatus.OK).body(null);
         }
     }
 
