@@ -6,6 +6,8 @@ import com.htwberlin.studyblog.api.helper.PathVariableParser;
 import com.htwberlin.studyblog.api.models.ApplicationUserModel;
 import com.htwberlin.studyblog.api.modelsEntity.ApplicationUserEntity;
 import com.htwberlin.studyblog.api.utilities.ENV;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -18,12 +20,15 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 /** ApplicationJWT
  *  Static Class for managing Application-JWT-Token
  */
-public final class ApplicationJWT {
-    public static final String JWT_KEY_STUDYBLOG = "studyblog_jwt";
-    public static final String BEARER_PREFIX = "Bearer ";
-    public static final String ROLE_KEY = "roles";
+@Service
+@AllArgsConstructor
+public class ApplicationJWT {
+    public final String JWT_KEY_STUDYBLOG = "studyblog_jwt";
+    public final String BEARER_PREFIX = "Bearer ";
+    public final String ROLE_KEY = "roles";
+    private final PathVariableParser pathVarParser;
 
-    private static final int expiredDuration = 1000 * 60 * 60 * 24 * 60;
+    private final int expiredDuration = 1000 * 60 * 60 * 24 * 60;
 
     /**
      * Creates a JWT-Token with the userId, username and roles of the passed dbUser
@@ -31,7 +36,7 @@ public final class ApplicationJWT {
      * @param user ApplicationUserEntity
      * @return String JWT-Token
      */
-    public static String createUserModelToken(HttpServletRequest request, ApplicationUserEntity user) {
+    public String createUserModelToken(HttpServletRequest request, ApplicationUserEntity user) {
         String userObjectString = user.getId() + ";" + user.getUsername();
         return JWT.create()
                 .withSubject(userObjectString)
@@ -49,7 +54,7 @@ public final class ApplicationJWT {
      * @param jwt String JWT-Token
      * @return JWTVerificationResponse
      */
-    public static JWTVerificationResponse validateToken(String jwt) {
+    public JWTVerificationResponse validateToken(String jwt) {
         if (jwt == null || jwt.isEmpty())
             return new JWTVerificationResponse(false, "The JWT-Token was null!");
 
@@ -59,7 +64,7 @@ public final class ApplicationJWT {
             var decodedJwt = jwtVerifier.verify(jwt);
 
             String[] userIdAndName = decodedJwt.getSubject().split(";");
-            Long userId = PathVariableParser.parseLong(userIdAndName[0]);
+            Long userId = pathVarParser.parseLong(userIdAndName[0]);
             String username = userIdAndName[1];
             String role = decodedJwt.getClaim(ROLE_KEY).asString();
 
@@ -75,7 +80,7 @@ public final class ApplicationJWT {
      * @param request http.request
      * @return String JWT-Token without "Bearer "-Prefix or Null
      */
-    public static String getTokenFromRequestHeader(HttpServletRequest request) {
+    public String getTokenFromRequestHeader(HttpServletRequest request) {
         String authHeader = request.getHeader(AUTHORIZATION);
         return authHeader == null ? null : removeBearerPrefix(authHeader);
     }
@@ -86,7 +91,7 @@ public final class ApplicationJWT {
      * @param request http.request
      * @return String JWT-Token or Null
      */
-    public static String getTokenFromRequestCookie(HttpServletRequest request) {
+    public String getTokenFromRequestCookie(HttpServletRequest request) {
         var jwtCookies = getJWTCookies(request);
         if(jwtCookies == null || jwtCookies.size() == 0)
             return null;
@@ -101,7 +106,7 @@ public final class ApplicationJWT {
      * @param request http.request
      * @return JWTVerificationResponse
      */
-    public static JWTVerificationResponse getTokenVerificationResponseFromRequest(HttpServletRequest request) {
+    public JWTVerificationResponse getTokenVerificationResponseFromRequest(HttpServletRequest request) {
         var validatedToken = validateToken(getTokenFromRequestCookie(request));
         if(validatedToken.isValid()) return validatedToken;
 
@@ -115,7 +120,7 @@ public final class ApplicationJWT {
      * @param request http.request
      * @return ApplicationUserModel CurrentValidUser or Null
      */
-    public static ApplicationUserModel getUserFromJWT(HttpServletRequest request) {
+    public ApplicationUserModel getUserFromJWT(HttpServletRequest request) {
         var cookieUser = getUserFromRequestCookie(request);
         if(cookieUser != null)
             return cookieUser;
@@ -128,7 +133,7 @@ public final class ApplicationJWT {
      * @param request http.request
      * @return JWTUser CurrentValidUser or Null
      */
-    public static ApplicationUserModel getUserFromRequestCookie(HttpServletRequest request) {
+    public ApplicationUserModel getUserFromRequestCookie(HttpServletRequest request) {
         return validateToken(getTokenFromRequestCookie(request)).getUser();
     }
 
@@ -137,7 +142,7 @@ public final class ApplicationJWT {
      * @param request http.request
      * @return JWTUser CurrentValidUser or Null
      */
-    public static ApplicationUserModel getUserFromRequestHeader(HttpServletRequest request) {
+    public ApplicationUserModel getUserFromRequestHeader(HttpServletRequest request) {
         return validateToken(getTokenFromRequestHeader(request)).getUser();
     }
 
@@ -148,12 +153,12 @@ public final class ApplicationJWT {
      * @param request http.request
      * @return List of StudyBlog-Cookies or Null
      */
-    private static List<Cookie> getJWTCookies(HttpServletRequest request) {
+    private List<Cookie> getJWTCookies(HttpServletRequest request) {
         var cookies = request.getCookies();
 
         if(cookies == null) return null;
         List<Cookie> jwtCookies = stream(request.getCookies())
-                .filter(p -> p.getName().equals(ApplicationJWT.JWT_KEY_STUDYBLOG)).toList();
+                .filter(p -> p.getName().equals(JWT_KEY_STUDYBLOG)).toList();
 
         if(jwtCookies.size() == 0) return null;
 
@@ -165,10 +170,10 @@ public final class ApplicationJWT {
      * @param jwtWithPrefix String JWT-Token with Bearer-Prefix (from Authorization-Header)
      * @return String cleaned JWT-Token
      */
-    private static String removeBearerPrefix(String jwtWithPrefix) {
-        if(!jwtWithPrefix.startsWith(ApplicationJWT.BEARER_PREFIX))
+    private String removeBearerPrefix(String jwtWithPrefix) {
+        if(!jwtWithPrefix.startsWith(BEARER_PREFIX))
             return jwtWithPrefix;
 
-        return jwtWithPrefix.substring(ApplicationJWT.BEARER_PREFIX.length());
+        return jwtWithPrefix.substring(BEARER_PREFIX.length());
     }
 }

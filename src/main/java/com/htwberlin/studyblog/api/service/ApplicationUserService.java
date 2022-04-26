@@ -32,14 +32,19 @@ public class ApplicationUserService {
     private final BlogPostRepository blogPostRepository;
     private final FavoriteRepository favoriteRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ApplicationJWT appJWT;
+    private final ServiceValidator serviceValidator;
+    private final EntityModelTransformer transformer;
+    private final PathVariableParser pathVarParser;
+    private final ObjectValidator objValidator;
 
     /**
      * Fetches all users from the DB and transforms the entities to models.
      * @return List<ApplicationUserModel>
      */
     public List<ApplicationUserModel> getUsers(HttpServletRequest request) throws Exception {
-        ServiceValidator.validateIsUserInRole(request, userRepository, Role.ADMIN);
-        return EntityModelTransformer.userEntitiesToModels(userRepository.findAll());
+        serviceValidator.validateIsUserInRole(request, userRepository, Role.ADMIN);
+        return transformer.userEntitiesToModels(userRepository.findAll());
     }
 
     /**
@@ -50,7 +55,7 @@ public class ApplicationUserService {
      */
     public String registerUser(HttpServletRequest request, ApplicationUserEntity user, String initialRole) throws Exception {
         user.setRole(initialRole);
-        return ApplicationJWT.createUserModelToken(request, registerUser(user));
+        return appJWT.createUserModelToken(request, registerUser(user));
     }
 
     /**
@@ -74,8 +79,8 @@ public class ApplicationUserService {
      * @throws Exception handle exception
      */
     public ApplicationUserModel registerUserByAdmin(HttpServletRequest request, ApplicationUserEntity user) throws Exception {
-        ServiceValidator.validateIsUserInRole(request, userRepository, Role.ADMIN);
-        return EntityModelTransformer.userEntityToModel(registerUser(user));
+        serviceValidator.validateIsUserInRole(request, userRepository, Role.ADMIN);
+        return transformer.userEntityToModel(registerUser(user));
     }
 
     /**
@@ -89,20 +94,20 @@ public class ApplicationUserService {
      * @throws Exception handling exception
      */
     public String updateUser(HttpServletRequest request, ApplicationUserEntity updatedUser) throws Exception {
-        var manipulationDbUser = ServiceValidator.getValidDbUserFromRequest(request, userRepository, Role.STUDENT, Role.ADMIN);
+        var manipulationDbUser = serviceValidator.getValidDbUserFromRequest(request, userRepository, Role.STUDENT, Role.ADMIN);
         validateRole(manipulationDbUser.getRole());
         updatedUser.setId(manipulationDbUser.getId());
         updatedUser.setRole(manipulationDbUser.getRole());
         changeUsername(manipulationDbUser, updatedUser);
         changePassword(manipulationDbUser, updatedUser);
 
-        var savedUpdatedUser = ObjectValidator.getValidObjOrThrowException(
+        var savedUpdatedUser = objValidator.getValidObjOrThrowException(
             userRepository.save(manipulationDbUser),
             EXCEPTION,
             "User could not be updated!"
         );
 
-        return ApplicationJWT.createUserModelToken(request, savedUpdatedUser);
+        return appJWT.createUserModelToken(request, savedUpdatedUser);
     }
 
     /**
@@ -120,10 +125,10 @@ public class ApplicationUserService {
      * @throws Exception handling exception
      */
     public ApplicationUserModel updateUserByAdmin(HttpServletRequest request, String id, ApplicationUserEntity updatedUser) throws Exception {
-        ServiceValidator.validateIsUserInRole(request, userRepository, Role.ADMIN);
-        Long dbUserId = PathVariableParser.parseLong(id);
+        serviceValidator.validateIsUserInRole(request, userRepository, Role.ADMIN);
+        Long dbUserId = pathVarParser.parseLong(id);
         validateUsername(updatedUser.getUsername());
-        var manipulationDbUser = ServiceValidator.getValidDbUserById(userRepository, dbUserId);
+        var manipulationDbUser = serviceValidator.getValidDbUserById(userRepository, dbUserId);
 
         if(isManipulationUserAdmin(manipulationDbUser))
             checkRequestUserIsAuthorizedForAdminManipulation(request, manipulationDbUser, updatedUser);
@@ -132,7 +137,7 @@ public class ApplicationUserService {
         changePassword(manipulationDbUser, updatedUser);
         changeRole(manipulationDbUser, updatedUser);
 
-        return EntityModelTransformer.userEntityToModel(userRepository.save(manipulationDbUser));
+        return transformer.userEntityToModel(userRepository.save(manipulationDbUser));
     }
 
     /**
@@ -146,8 +151,8 @@ public class ApplicationUserService {
      * @throws Exception handling exception
      */
     public void deleteUser(HttpServletRequest request, String id) throws Exception {
-        Long userId = PathVariableParser.parseLong(id);
-        var delDbUser = ServiceValidator.getValidDbUserById(userRepository, userId, Role.STUDENT, Role.ADMIN);
+        Long userId = pathVarParser.parseLong(id);
+        var delDbUser = serviceValidator.getValidDbUserById(userRepository, userId, Role.STUDENT, Role.ADMIN);
 
         if(isManipulationUserAdmin(delDbUser))
             checkRequestUserIsAuthorizedToDeleteAdminUser(request, delDbUser);
@@ -220,7 +225,7 @@ public class ApplicationUserService {
      * @throws Exception handle exception
      */
     private void checkRequestUserIsAuthorizedForAdminManipulation(HttpServletRequest request, ApplicationUserEntity manipulationDbUser, ApplicationUserEntity updatedUser) throws Exception {
-        var requestUser = ServiceValidator.getValidDbUserFromRequest(request, userRepository);
+        var requestUser = serviceValidator.getValidDbUserFromRequest(request, userRepository);
         validateManipulationDbUserIsRequestUser(manipulationDbUser, requestUser);
         validateManipulationUserHasNotChangedRole(manipulationDbUser, updatedUser);
     }
@@ -233,7 +238,7 @@ public class ApplicationUserService {
      * @throws Exception handle exception
      */
     private void checkRequestUserIsAuthorizedToDeleteAdminUser(HttpServletRequest request, ApplicationUserEntity delDbUser) throws Exception {
-        var requestUser = ServiceValidator.getValidDbUserFromRequest(request, userRepository);
+        var requestUser = serviceValidator.getValidDbUserFromRequest(request, userRepository);
         validateManipulationDbUserIsRequestUser(delDbUser, requestUser);
     }
 
@@ -245,10 +250,10 @@ public class ApplicationUserService {
      * @param requestUser ApplicationUserEntity requestUser
      */
     private void validateManipulationDbUserIsRequestUser(ApplicationUserEntity manipulationDbUser, ApplicationUserEntity requestUser) {
-        ServiceValidator.validateEqualUserIds(
-                manipulationDbUser,
-                requestUser,
-                "You can't manipulate a admin-user, if you aren't this User!"
+        serviceValidator.validateEqualUserIds(
+            manipulationDbUser,
+            requestUser,
+            "You can't manipulate a admin-user, if you aren't this User!"
         );
     }
 

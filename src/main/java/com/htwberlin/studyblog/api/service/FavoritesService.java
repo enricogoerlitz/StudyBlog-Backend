@@ -10,7 +10,7 @@ import com.htwberlin.studyblog.api.repository.ApplicationUserRepository;
 import com.htwberlin.studyblog.api.repository.BlogPostRepository;
 import com.htwberlin.studyblog.api.repository.FavoriteRepository;
 import com.htwberlin.studyblog.api.helper.PathVariableParser;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
@@ -21,11 +21,14 @@ import java.util.Set;
  *  Service for UserBlogPostFavorites BusinessLogic
  */
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class FavoritesService {
     private final FavoriteRepository favouritesRepository;
     private final ApplicationUserRepository userRepository;
     private final BlogPostRepository blogPostRepository;
+    private final ServiceValidator serviceValidator;
+    private final EntityModelTransformer transformer;
+    private final PathVariableParser pathVarParser;
 
     /**
      * Returns the favorite blogPostIds of the Request-JWT-User as Set of BlogPostIds
@@ -34,7 +37,7 @@ public class FavoritesService {
      * @throws Exception handle exception
      */
     public Set<Long> getFavoritesByCreator(HttpServletRequest request) throws Exception {
-        return ServiceValidator.getValidUserFavoriteBlogPostIdsByRequestAsSet(request, favouritesRepository);
+        return serviceValidator.getValidUserFavoriteBlogPostIdsByRequestAsSet(request, favouritesRepository);
     }
 
     /**
@@ -60,13 +63,13 @@ public class FavoritesService {
      * @throws Exception handle exception
      */
     public FavoritesModel addFavorite(HttpServletRequest request, String blogPostId) throws Exception {
-        Long validBlogPostId = PathVariableParser.parseLong(blogPostId);
+        Long validBlogPostId = pathVarParser.parseLong(blogPostId);
         var requestUser = getValidRequestUser(request);
-        var blogPost = ServiceValidator.getValidBlogPostById(blogPostRepository, validBlogPostId);
+        var blogPost = serviceValidator.getValidBlogPostById(blogPostRepository, validBlogPostId);
         checkIsFavoriteAlreadyInDb(blogPost.getId(), requestUser.getId());
         var addedFavoriteEntity = favouritesRepository.save(new FavoritesEntity(null, requestUser, blogPost));
 
-        return EntityModelTransformer.favoritesEntityToModel(addedFavoriteEntity);
+        return transformer.favoritesEntityToModel(addedFavoriteEntity);
     }
 
     /**
@@ -77,8 +80,8 @@ public class FavoritesService {
      * @throws Exception handle exception
      */
     public void removeFavorite(HttpServletRequest request, String blogPostId) throws Exception {
-        Long validBlogPostId = PathVariableParser.parseLong(blogPostId);
-        var delFavorite = ServiceValidator.getValidFavoriteByBlogPostIdAndRequestUser(
+        Long validBlogPostId = pathVarParser.parseLong(blogPostId);
+        var delFavorite = serviceValidator.getValidFavoriteByBlogPostIdAndRequestUser(
                 request,
                 userRepository,
                 favouritesRepository,
@@ -107,6 +110,6 @@ public class FavoritesService {
      * @throws Exception handle exception
      */
     private ApplicationUserEntity getValidRequestUser(HttpServletRequest request) throws Exception {
-        return ServiceValidator.getValidDbUserFromRequest(request, userRepository);
+        return serviceValidator.getValidDbUserFromRequest(request, userRepository);
     }
 }

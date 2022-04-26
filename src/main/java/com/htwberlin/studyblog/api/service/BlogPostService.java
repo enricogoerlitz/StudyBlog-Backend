@@ -26,6 +26,9 @@ public class BlogPostService {
     private final BlogPostRepository blogPostRepository;
     private final ApplicationUserRepository userRepository;
     private final FavoriteRepository favoriteRepository;
+    private final ServiceValidator serviceValidator;
+    private final PathVariableParser pathVarParser;
+    private final EntityModelTransformer transformer;
 
     /**
      * Fetched all BlogPosts.
@@ -35,8 +38,8 @@ public class BlogPostService {
      * @throws Exception handle exception
      */
     public List<BlogPostModel> getBlogPosts(HttpServletRequest request) throws Exception {
-        var userFavorites = ServiceValidator.getValidUserFavoriteBlogPostIdsByRequestAsSet(request, favoriteRepository);
-        return EntityModelTransformer.blogPostEntitiesToModels(blogPostRepository.findAll(), userFavorites);
+        var userFavorites = serviceValidator.getValidUserFavoriteBlogPostIdsByRequestAsSet(request, favoriteRepository);
+        return transformer.blogPostEntitiesToModels(blogPostRepository.findAll(), userFavorites);
     }
 
     /**
@@ -56,10 +59,10 @@ public class BlogPostService {
         blogPost.setCreationDate(new Date());
         blogPost.setLastEditDate(new Date());
 
-        var blogPostEntity = EntityModelTransformer.blogPostModelToEntity(blogPost, requestUser);
+        var blogPostEntity = transformer.blogPostModelToEntity(blogPost, requestUser);
         var savedBlogPost = blogPostRepository.save(blogPostEntity);
 
-        return EntityModelTransformer.blogPostEntityToModel(savedBlogPost, false);
+        return transformer.blogPostEntityToModel(savedBlogPost, false);
     }
 
     /**
@@ -88,7 +91,7 @@ public class BlogPostService {
         var dbBlogPostCreator = getValidDbBlogPostCreator(dbBlogPost.getCreator().getId());
         var requestUser = getValidDbRequestUser(request, Role.STUDENT, Role.ADMIN);
 
-        ServiceValidator.validateEqualUserIds(
+        serviceValidator.validateEqualUserIds(
             requestUser,
             dbBlogPostCreator,
             "You are not allowed to update this BlogPost, because you are not the Creator!"
@@ -110,7 +113,7 @@ public class BlogPostService {
      * @throws Exception handle exception
      */
     public BlogPostModel updateBlogPostByAdmin(HttpServletRequest request, BlogPostModel blogPost) throws Exception {
-        ServiceValidator.validateIsUserInRole(getValidDbRequestUser(request), Role.ADMIN);
+        serviceValidator.validateIsUserInRole(getValidDbRequestUser(request), Role.ADMIN);
         var dbBlogPost = getValidBlogPost(blogPost.getId());
         updateTitleAndContentOfBlogPost(dbBlogPost, blogPost);
 
@@ -127,11 +130,11 @@ public class BlogPostService {
      * @throws Exception handled exception
      */
     public void deleteBlogPost(HttpServletRequest request, String id) throws Exception {
-        Long blogPostId = PathVariableParser.parseLong(id);
+        Long blogPostId = pathVarParser.parseLong(id);
         var requestUser = getValidDbRequestUser(request);
         var dbBlogPost = getValidBlogPost(blogPostId);
 
-        ServiceValidator.validateEqualUserIds(
+        serviceValidator.validateEqualUserIds(
             dbBlogPost.getCreator(),
             requestUser,
             "You are not allowed to delete this BlogPost, because you are not the Creator!"
@@ -149,8 +152,8 @@ public class BlogPostService {
      * @param id String
      */
     public void deleteBlogPostByAdmin(HttpServletRequest request, String id) throws Exception {
-        ServiceValidator.validateIsUserInRole(getValidDbRequestUser(request), Role.ADMIN);
-        Long blogPostId = PathVariableParser.parseLong(id);
+        serviceValidator.validateIsUserInRole(getValidDbRequestUser(request), Role.ADMIN);
+        Long blogPostId = pathVarParser.parseLong(id);
         deleteAllFavoritesFKs(blogPostId);
         blogPostRepository.deleteById(blogPostId);
     }
@@ -165,7 +168,7 @@ public class BlogPostService {
         blogPost.setLastEditDate(new Date());
         var updatedBlogpost = blogPostRepository.save(blogPost);
 
-        return EntityModelTransformer.blogPostEntityToModel(updatedBlogpost, false);
+        return transformer.blogPostEntityToModel(updatedBlogpost, false);
     }
 
     /**
@@ -183,7 +186,7 @@ public class BlogPostService {
      * @throws Exception handle exception
      */
     private BlogPostEntity getValidBlogPost(Long id) throws Exception {
-        return ServiceValidator.getValidBlogPostById(blogPostRepository, id);
+        return serviceValidator.getValidBlogPostById(blogPostRepository, id);
     }
 
     /**
@@ -193,7 +196,7 @@ public class BlogPostService {
      * @throws Exception handle exception
      */
     private ApplicationUserEntity getValidDbBlogPostCreator(Long id) throws Exception {
-        return ServiceValidator.getValidDbUserById(userRepository, id);
+        return serviceValidator.getValidDbUserById(userRepository, id);
     }
 
     /**
@@ -203,7 +206,7 @@ public class BlogPostService {
      * @throws Exception handle exception
      */
     private ApplicationUserEntity getValidDbRequestUser(HttpServletRequest request, Role... authenticatedRoles) throws Exception {
-        return ServiceValidator.getValidDbUserFromRequest(request, userRepository, authenticatedRoles);
+        return serviceValidator.getValidDbUserFromRequest(request, userRepository, authenticatedRoles);
     }
 
     /**

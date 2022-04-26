@@ -9,7 +9,9 @@ import com.htwberlin.studyblog.api.modelsEntity.FavoritesEntity;
 import com.htwberlin.studyblog.api.repository.ApplicationUserRepository;
 import com.htwberlin.studyblog.api.repository.BlogPostRepository;
 import com.htwberlin.studyblog.api.repository.FavoriteRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.security.access.AuthorizationServiceException;
+import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -27,7 +29,11 @@ import static com.htwberlin.studyblog.api.utilities.ResponseEntityException.*;
  *      (2.) the resource could not be found in the DB
  *      (3.) the valid User is not authorized to get this resource
  */
-public final class ServiceValidator {
+@Service
+@AllArgsConstructor
+public class ServiceValidator {
+    private final ApplicationJWT appJWT;
+    private ObjectValidator objValidator;
 
     /**
      * Returns a valid JWTUser, based on the JWT-Token of the request
@@ -40,9 +46,9 @@ public final class ServiceValidator {
      * @return JWTUser valid JWTUser
      * @throws Exception handling exception
      */
-    public static ApplicationUserModel getValidRequestUser(HttpServletRequest request) throws Exception {
-        return ObjectValidator.getValidObjOrThrowException(
-            ApplicationJWT.getUserFromJWT(request),
+    public ApplicationUserModel getValidRequestUser(HttpServletRequest request) throws Exception {
+        return objValidator.getValidObjOrThrowException(
+            appJWT.getUserFromJWT(request),
             AUTHORIZATION_SERVICE_EXCEPTION,
             "JWT-Token was not valid!"
         );
@@ -63,7 +69,7 @@ public final class ServiceValidator {
      * @return ApplicationUserEntity valid DbUser
      * @throws Exception handling exception
      */
-    public static ApplicationUserEntity getValidDbUserFromRequest(HttpServletRequest request, ApplicationUserRepository userRepository, Role... authenticatedRoles) throws Exception {
+    public ApplicationUserEntity getValidDbUserFromRequest(HttpServletRequest request, ApplicationUserRepository userRepository, Role... authenticatedRoles) throws Exception {
         var requestUser = getValidRequestUser(request);
         return getValidDbUserByUsername(userRepository, requestUser.getUsername(), authenticatedRoles);
     }
@@ -80,9 +86,9 @@ public final class ServiceValidator {
      * @return ApplicationUserEntity valid DbUser
      * @throws Exception handling exception
      */
-    public static ApplicationUserEntity getValidDbUserById(ApplicationUserRepository userRepository, Long id, Role... authenticatedRoles) throws Exception {
+    public ApplicationUserEntity getValidDbUserById(ApplicationUserRepository userRepository, Long id, Role... authenticatedRoles) throws Exception {
         var optionalUser = userRepository.findById(id);
-        var validDbUser = ObjectValidator.getValidObjOrThrowException(
+        var validDbUser = objValidator.getValidObjOrThrowException(
             optionalUser.isEmpty() ? null : optionalUser.get(),
             ILLEGAL_ARGUMENT_EXCEPTION,
             "Could not find user with id " + id + " in the DB!"
@@ -104,8 +110,8 @@ public final class ServiceValidator {
      * @return ApplicationUserEntity valid DbUser
      * @throws Exception handling exception
      */
-    public static ApplicationUserEntity getValidDbUserByUsername(ApplicationUserRepository userRepository, String username, Role... authenticatedRoles) throws Exception {
-        var validDbUser = ObjectValidator.getValidObjOrThrowException(
+    public ApplicationUserEntity getValidDbUserByUsername(ApplicationUserRepository userRepository, String username, Role... authenticatedRoles) throws Exception {
+        var validDbUser = objValidator.getValidObjOrThrowException(
             userRepository.findByUsername(username),
             USERNAME_NOT_FOUND_EXCEPTION,
             "Could not find user with username " + username + " in the DB!"
@@ -126,9 +132,9 @@ public final class ServiceValidator {
      * @return BlogPostEntity valid DbBlogPost
      * @throws Exception handling exception
      */
-    public static BlogPostEntity getValidBlogPostById(BlogPostRepository blogPostRepository, Long id) throws Exception {
+    public BlogPostEntity getValidBlogPostById(BlogPostRepository blogPostRepository, Long id) throws Exception {
         var optionalBlogPost = blogPostRepository.findById(id);
-        return ObjectValidator.getValidObjOrThrowException(
+        return objValidator.getValidObjOrThrowException(
                 optionalBlogPost.isEmpty() ? null : optionalBlogPost.get(),
                 EXCEPTION,
                 "Blogpost could not be found in DB!"
@@ -147,7 +153,7 @@ public final class ServiceValidator {
      * @return List<FavoritesEntity>
      * @throws Exception handling exception
      */
-    public static List<FavoritesEntity> getValidUserFavoriteBlogPostsByRequest(HttpServletRequest request, FavoriteRepository favoriteRepository) throws Exception {
+    public List<FavoritesEntity> getValidUserFavoriteBlogPostsByRequest(HttpServletRequest request, FavoriteRepository favoriteRepository) throws Exception {
         var user = getValidRequestUser(request);
         var userFavorites = favoriteRepository.findAllByCreator_Username(user.getUsername());
         return userFavorites == null ? new ArrayList<>() : userFavorites;
@@ -167,12 +173,12 @@ public final class ServiceValidator {
      * @return FavoritesEntity single fetched favorite
      * @throws Exception handling exception
      */
-    public static FavoritesEntity getValidFavoriteByBlogPostIdAndRequestUser(HttpServletRequest request, ApplicationUserRepository userRepository, FavoriteRepository favoriteRepository, Long blogPostId) throws Exception {
-        var requestUser = ServiceValidator.getValidDbUserFromRequest(request, userRepository);
-        return ObjectValidator.getValidObjOrThrowException(
-                favoriteRepository.findByBlogPost_IdAndCreator_Id(blogPostId, requestUser.getId()),
-                ILLEGAL_ARGUMENT_EXCEPTION,
-                "Could not find the favorite of this user to the blogpost in the DB!"
+    public FavoritesEntity getValidFavoriteByBlogPostIdAndRequestUser(HttpServletRequest request, ApplicationUserRepository userRepository, FavoriteRepository favoriteRepository, Long blogPostId) throws Exception {
+        var requestUser = getValidDbUserFromRequest(request, userRepository);
+        return objValidator.getValidObjOrThrowException(
+            favoriteRepository.findByBlogPost_IdAndCreator_Id(blogPostId, requestUser.getId()),
+            ILLEGAL_ARGUMENT_EXCEPTION,
+            "Could not find the favorite of this user to the blogpost in the DB!"
         );
     }
 
@@ -183,7 +189,7 @@ public final class ServiceValidator {
      * @return Set<Long> a Set of BlogPostIds
      * @throws Exception handling exception
      */
-    public static Set<Long> getValidUserFavoriteBlogPostIdsByRequestAsSet(HttpServletRequest request, FavoriteRepository favoriteRepository) throws Exception {
+    public Set<Long> getValidUserFavoriteBlogPostIdsByRequestAsSet(HttpServletRequest request, FavoriteRepository favoriteRepository) throws Exception {
         return getValidUserFavoriteBlogPostsByRequest(request, favoriteRepository)
                 .stream().map(fav -> fav.getBlogPost().getId()).collect(Collectors.toSet());
     }
@@ -194,7 +200,7 @@ public final class ServiceValidator {
      * @param user ApplicationUserEntity
      * @param authenticatedRoles Authorized Roles
      */
-    public static void validateIsUserInRole(ApplicationUserEntity user, Role... authenticatedRoles) throws AuthorizationServiceException {
+    public void validateIsUserInRole(ApplicationUserEntity user, Role... authenticatedRoles) throws AuthorizationServiceException {
         if(authenticatedRoles.length == 0)
             return;
         for(var role : authenticatedRoles) {
@@ -213,7 +219,7 @@ public final class ServiceValidator {
      * @param authenticatedRoles Roles[]
      * @throws Exception handle exception
      */
-    public static void validateIsUserInRole(HttpServletRequest request, ApplicationUserRepository userRepository, Role... authenticatedRoles) throws Exception {
+    public void validateIsUserInRole(HttpServletRequest request, ApplicationUserRepository userRepository, Role... authenticatedRoles) throws Exception {
         validateIsUserInRole(getValidDbUserFromRequest(request, userRepository), authenticatedRoles);
     }
 
@@ -225,7 +231,7 @@ public final class ServiceValidator {
      * @param user2 ApplicationUserEntity second user
      * @param exceptionMessage String custom ErrorMessage
      */
-    public static void validateEqualUserIds(ApplicationUserEntity user1, ApplicationUserEntity user2, String exceptionMessage) {
+    public void validateEqualUserIds(ApplicationUserEntity user1, ApplicationUserEntity user2, String exceptionMessage) {
         if(user1.getId() != user2.getId())
             throw new AuthorizationServiceException(exceptionMessage);
     }

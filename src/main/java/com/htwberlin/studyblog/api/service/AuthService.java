@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 public class AuthService {
     private final ApplicationUserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ApplicationJWT appJWT;
 
     /**
      * Tries to fetch the Current-Auth-User, based on the Request-JWT-Token.
@@ -31,7 +32,7 @@ public class AuthService {
      * @return ApplicationUserModel Current Authenticated UserModel
      */
     public ApplicationUserModel getCurrentUser(HttpServletRequest request) {
-        var user = ApplicationJWT.getUserFromJWT(request);
+        var user = appJWT.getUserFromJWT(request);
         if(user == null)
             throw new AuthorizationServiceException("The RequestUser was null!");
 
@@ -45,7 +46,7 @@ public class AuthService {
      * @return String JWT-Token
      */
     public String loginVisitor(HttpServletRequest request) {
-        return ApplicationJWT.createUserModelToken(
+        return appJWT.createUserModelToken(
             request,
             new ApplicationUserEntity(-1L, "VisitorUser", null, Role.VISITOR.name())
         );
@@ -64,6 +65,6 @@ public class AuthService {
         if(dbUser == null || !passwordEncoder.matches(authUser.getPassword(), dbUser.getPassword()))
             throw new AuthorizationServiceException("This User ist not registered!");
 
-        return ApplicationJWT.createUserModelToken(request, dbUser);
+        return appJWT.createUserModelToken(request, dbUser);
     }
 }

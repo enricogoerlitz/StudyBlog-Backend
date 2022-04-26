@@ -1,6 +1,7 @@
 package com.htwberlin.studyblog;
 
 import com.htwberlin.studyblog.api.authentication.Role;
+import com.htwberlin.studyblog.api.helper.PathVariableParser;
 import com.htwberlin.studyblog.api.modelsEntity.ApplicationUserEntity;
 import com.htwberlin.studyblog.api.modelsEntity.BlogPostEntity;
 import com.htwberlin.studyblog.api.modelsEntity.FavoritesEntity;
@@ -39,7 +40,9 @@ public class StudyblogApplication {
 	@Bean
 	CommandLineRunner run(ApplicationUserService userService, BlogPostService blogPostService, FavoritesService favouriteService) {
 		// for tests disabled!
-		return args -> {};
+		return args -> {
+			log.info("✅ ✅ ✅  !>>>>>  🥳 APPLICATION READY 🥳  <<<<<!  ✅ ✅ ✅");
+		};
 		/*
 		return args -> {
 			getInitUsers().forEach(user -> {
@@ -62,6 +65,11 @@ public class StudyblogApplication {
 	@Bean
 	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
+	}
+
+	@Bean
+	PathVariableParser PathVariableParser() {
+		return new PathVariableParser();
 	}
 
 	/**
