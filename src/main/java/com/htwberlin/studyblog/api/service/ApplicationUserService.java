@@ -180,9 +180,10 @@ public class ApplicationUserService {
      * @param manipulationDbUser ApplicationUserEntity manipulationDbUser
      * @param updatedUser ApplicationUserEntity updatedUser
      */
-    private void changePassword(ApplicationUserEntity manipulationDbUser, ApplicationUserEntity updatedUser) {
-        if(!updatedUser.getPassword().isBlank())
-            manipulationDbUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+    private void changePassword(ApplicationUserEntity manipulationDbUser, ApplicationUserEntity updatedUser) throws Exception {
+        if(updatedUser.getPassword().isBlank()) return;
+        validatePassword(updatedUser.getPassword());
+        manipulationDbUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
     }
 
     /**
@@ -284,5 +285,15 @@ public class ApplicationUserService {
     private void validateUsername(String username) throws Exception {
         if(username.length() < 4 || username.length() > 50)
             throw new Exception("Username needs a length of min 4 and max 50 characters!");
+    }
+
+    /**
+     * Validates, that the password has a size of min 4 and max 300
+     * @param password String
+     * @throws Exception handle exception
+     */
+    private void validatePassword(String password) throws Exception {
+        if(password.length() < 3 || password.length() > 300)
+            throw new Exception("Password needs a length of min 3 and max 50 characters!");
     }
 }
