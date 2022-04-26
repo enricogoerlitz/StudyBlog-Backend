@@ -38,6 +38,9 @@ public class StudyblogApplication {
 	 */
 	@Bean
 	CommandLineRunner run(ApplicationUserService userService, BlogPostService blogPostService, FavoritesService favouriteService) {
+		// for tests disabled!
+		return args -> {};
+		/*
 		return args -> {
 			getInitUsers().forEach(user -> {
 				try {
@@ -52,6 +55,8 @@ public class StudyblogApplication {
 			});
 			log.info("✅ ✅ ✅  !>>>>>  🥳 APPLICATION READY 🥳  <<<<<!  ✅ ✅ ✅");
 		};
+
+		 */
 	}
 
 	@Bean
