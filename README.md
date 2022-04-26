@@ -1,4 +1,5 @@
 # README
+[![CI](https://github.com/enricogoerlitz/StudyBlogBackend/actions/workflows/ci.yml/badge.svg)](https://github.com/enricogoerlitz/StudyBlogBackend/actions/workflows/ci.yml)
 
 ### Description
 StudyBlog is an application for students to share there students life. <br />
