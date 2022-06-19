@@ -2,7 +2,7 @@
 [![CI](https://github.com/enricogoerlitz/StudyBlogBackend/actions/workflows/ci.yml/badge.svg)](https://github.com/enricogoerlitz/StudyBlogBackend/actions/workflows/ci.yml)
 
 ### How to use (for the profs)
-Unsere App finden Sie unter diesem Link: <a href="https://studyblog-df.herokuapp.com/login">StudyBlog</a> <br>
+Unsere App finden Sie unter diesem Link: <a href="https://studyblog-df.herokuapp.com/login" target="_blank">StudyBlog</a> <br>
 ***(Sowohl das FE, als auch das BE benötigen etwas Zeit um zu starten. Wenn Sie eine Login-Form sehen, ist die Anwendung fertig geladen)*** <br>
 
 Wir haben Ihnen sowohl einen Admin-User (Benutzername: prof, Passwort: profpw), <br>
