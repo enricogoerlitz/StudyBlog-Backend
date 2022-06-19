@@ -6,10 +6,10 @@ Unsere App finden Sie unter diesem Link: <a href="https://studyblog-df.herokuapp
 ***(Sowohl das FE, als auch das BE benötigen etwas Zeit um zu starten. Wenn Sie eine Login-Form sehen, ist die Anwendung fertig geladen)*** <br>
 
 Wir haben Ihnen sowohl einen Admin-User (Benutzername: prof, Passwort: profpw), <br>
-als auch einen Student-User (Benutzername: profasstudent, Passwort: profasstudentpw) angelegt. Sie können sich auf der Login-Page oder auch auf der Register-Page ebenfalls als Visitor-User anmelden <br>
+als auch einen Student-User (Benutzername: profasstudent, Passwort: profasstudentpw) angelegt. Sie können sich auf der Login-Page oder auch auf der Register-Page ebenfalls als Visitor-User anmelden. <br>
 Die Anwendung funktioniert wie in der README beschrieben. <br>
 #### Allgemein
-- Überall sind validierungen sowohl client-, als auch serverseitig hinterlegt
+- Überall sind validierungen, sowohl client-, als auch serverseitig hinterlegt
 
 #### Login-Page
 - kann sich anmelden
@@ -24,16 +24,16 @@ Die Anwendung funktioniert wie in der README beschrieben. <br>
 #### BlogPost-Page
 ##### Admin
 - kann BlogPosts löschen (abgesehen von anderen Admin-User)
-- kann alle BlogPosts bearbeiten (alle)
+- kann alle BlogPosts bearbeiten
 - kann alles was Student kann
 
 ##### Student
 - kann BlogPosts filtern (Volltextsuche in [Titel, Text, Erstellername])
-- kann BlogPosts filtern nach Favoriten
+- kann BlogPosts nach Favoriten filtern
 - kann BlogPosts favorisieren / entfavorisieren
 - kann seine eigenen BlogPosts bearbeiten
 - kann BlogPost hinzufügen
--
+
 ##### Visitor
 - kann nur BlogPosts anschauen und Volltextfiltern
 
